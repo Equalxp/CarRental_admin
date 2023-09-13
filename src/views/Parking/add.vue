@@ -6,7 +6,8 @@
       </el-form-item>
 
       <el-form-item label="区域">
-        <el-cascader v-model="form.area" :options="options" :props="{ expandTrigger: 'hover' }" @change="handleChange"> </el-cascader>
+        <!-- 单向数据流 -->
+        <CityArea :cityAreaValue.sync="form.area" />
       </el-form-item>
 
       <el-form-item label="类型">
@@ -28,7 +29,9 @@
       </el-form-item>
 
       <el-form-item label="位置">
-        <div class="address-map"></div>
+        <div class="address-map">
+          <AMap />
+        </div>
       </el-form-item>
 
       <el-form-item label="经纬度坐标">
@@ -36,20 +39,24 @@
       </el-form-item>
 
       <el-form-item label="经纬度坐标">
-        <el-button type='primary'>确定</el-button>
+        <el-button type="primary" @click="aaa">确定</el-button>
       </el-form-item>
-
     </el-form>
   </div>
 </template>
 
 <script>
+// AMAP
+import AMap from "../amap/index.vue"
+// 组件
+import CityArea from "@c/common/cityArea"
 export default {
   name: "ParkingAdd",
   data() {
     return {
       form: {
         name: "",
+        area: "",
         region: "",
         date1: "",
         date2: "",
@@ -57,21 +64,24 @@ export default {
         type: [],
         resource: "",
         desc: ""
-      }
+      },
     }
   },
   methods: {
+    aaa() {
+      console.log(this.form.area)
+    },
     onSubmit() {
       console.log("submit!")
     }
-  }
+  },
+  components: { AMap, CityArea }
 }
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .address-map {
   width: 100%;
-  height: 350px;
-  border: 1px solid #ccc;
+  height: 500px;
 }
 </style>
