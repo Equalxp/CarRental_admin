@@ -22,7 +22,7 @@
         </el-col>
         <el-col :span="6">
           <div type="danger">
-            <el-button>新增品牌车辆</el-button>
+            <el-button @click="dialog_show = true">新增品牌车辆</el-button>
           </div>
         </el-col>
       </el-row>
@@ -47,14 +47,23 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 探出框 -->
+    <!-- 父->子 单项数据流 -->
+    <addCarsBrand :flagVisible.sync="dialog_show"  />
   </div>
 </template>
 
 <script>
+import addCarsBrand from "../../components/dialog/addCarsBrand.vue"
 export default {
   name: "Parking",
+  components: {
+    addCarsBrand
+  },
   data() {
     return {
+      // dialog
+      dialog_show:false,
       form: {
         parking_name: "",
         area: "",
@@ -106,11 +115,6 @@ export default {
     onSubmit() {
       console.log("submit!")
     },
-    methods: {
-      handleChange(value) {
-        console.log(value)
-      }
-    }
   }
 }
 </script>
