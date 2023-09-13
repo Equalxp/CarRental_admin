@@ -3,12 +3,12 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted, watch } from "@vue/composition-api";
+import { reactive, ref, onMounted, watch } from "@vue/composition-api"
 export default {
   name: "ConsoleIndex",
   components: {},
   props: {},
-  setup(props, { root }){
+  setup(props, { root }) {
     // 监听
     // watch(xxx, () => {})
     // 生命周期
@@ -25,5 +25,4 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

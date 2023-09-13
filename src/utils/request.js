@@ -25,10 +25,10 @@ service.interceptors.request.use(function (config) {
 service.interceptors.response.use(function (response) {
     const data = response.data;
     // 不为0，即接口异常时
-    if(data.resCode !== 0) {
+    if (data.resCode !== 0) {
         Message.error(data.message);
         return Promise.reject(data);
-    }else {
+    } else {
         return data; // return Promise.resolve(data);
     }
 }, function (error) {
