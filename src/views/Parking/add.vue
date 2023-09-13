@@ -30,16 +30,12 @@
 
       <el-form-item label="位置">
         <div class="address-map">
-          <AMap />
+          <AMap @lonlag="aaa" ref="amap" />
         </div>
       </el-form-item>
 
       <el-form-item label="经纬度坐标">
-        <el-input v-model="form.desc"></el-input>
-      </el-form-item>
-
-      <el-form-item label="经纬度坐标">
-        <el-button type="primary" @click="aaa">确定</el-button>
+        <el-input v-model="form.lonlag"></el-input>
       </el-form-item>
     </el-form>
   </div>
@@ -63,13 +59,22 @@ export default {
         delivery: false,
         type: [],
         resource: "",
-        desc: ""
-      },
+        lonlag: ""
+      }
     }
   },
   methods: {
-    aaa() {
-      console.log(this.form.area)
+    aaa(data) {
+      console.log("data", data)
+      this.form.lonlag = data.value
+    },
+    callbackComponent(params) {
+      if (params.function) {
+        this[params.function](params.data)
+      }
+    },
+    setMapCenter(data) {
+      this.$refs.amap.setMapCenter(data.address)
     },
     onSubmit() {
       console.log("submit!")
