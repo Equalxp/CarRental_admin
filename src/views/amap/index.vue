@@ -34,7 +34,9 @@ export default {
     })
   },
   methods: {
+    // 让父组件调用这个方法
     setMapCenter(value) {
+      // console.log("value", value) // value也是中文地址
       addressSetMapCenter(value, this.map)
     }
   }

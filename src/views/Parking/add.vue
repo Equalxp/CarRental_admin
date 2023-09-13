@@ -7,7 +7,7 @@
 
       <el-form-item label="区域">
         <!-- 单向数据流 -->
-        <CityArea :cityAreaValue.sync="form.area" />
+        <CityArea :cityAreaValue.sync="form.area" :mapLocation="true"  @callback="callbackComponent" />
       </el-form-item>
 
       <el-form-item label="类型">
@@ -73,8 +73,12 @@ export default {
         this[params.function](params.data)
       }
     },
+    // 拿到坐标塞给center
     setMapCenter(data) {
-      this.$refs.amap.setMapCenter(data.address)
+      // 获取到中文地址
+      console.log("setMapCenter", data)
+      // 通过地址去拿经纬度 调用地图的方法 
+      this.$refs.amap.setMapCenter(data)
     },
     onSubmit() {
       console.log("submit!")

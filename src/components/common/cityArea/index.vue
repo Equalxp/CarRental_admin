@@ -9,6 +9,7 @@ import { GetCity } from "@/api/common"
 export default {
   name: "",
   data() {
+    // 保存this
     const _this = this
     return {
       address: [],
@@ -50,13 +51,14 @@ export default {
                 item.leaf = level >= 2
               }
             })
-            // 存储省市区数据
+            // 存储省市区数据 方便从地点 -> 经纬度
             _this.addressData[jsonType[level].type] = data
             // 返回节点数据
             resolve(data)
           })
           // 获取address
           if (node.level !== 0) {
+            // level为1那就是获取了省
             _this.getAddress(node)
           }
         }
@@ -66,23 +68,26 @@ export default {
   methods: {
     changeValue(value) {
       this.$emit("update:cityAreaValue", value.join())
-      // 匹配最后一项，区县
+      // 匹配最后一项 区县
       const lastCode = value[value.length - 1]
       const area = this.addressData.area.filter(item => item.value == lastCode)[0]
       this.address[2] = area.label
       this.getAddress()
     },
-    /** 获取中文地址 */
+    // 获取中文地址
     getAddress(node) {
       if (node) {
+        // 索引值
         const index = node.level - 1
         this.address[index] = node.label
+        console.log("this.address", this.address)
       }
       // 为 true 时，执行地图交互
       if (this.mapLocation) {
         this.$emit("callback", {
           function: "setMapCenter",
           data: {
+            // 将级联选择的地址join
             address: this.address.join("")
           }
         })
