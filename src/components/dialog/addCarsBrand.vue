@@ -10,8 +10,14 @@
         </el-form-item>
         <el-form-item label="LOGO">
           <div class="upload-img-wrap">
-            <div class="upload-img"></div>
-            <div class="img-list"></div>
+            <div class="upload-img">
+              <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1593447137003&di=8e2c8ba51d3018e302c66a0bd851c7e8&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2F4e384e839d6b6e96.jpg" alt />
+            </div>
+            <ul class="img-list">
+              <li>
+                <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1593447137003&di=8e2c8ba51d3018e302c66a0bd851c7e8&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2F4e384e839d6b6e96.jpg" alt />
+              </li>
+            </ul>
           </div>
         </el-form-item>
         <el-form-item label="禁用启用">
@@ -63,13 +69,13 @@ export default {
   methods: {
     // 反向修改
     close() {
-      this.$emit('update:flagVisible',false)
+      this.$emit("update:flagVisible", false)
     }
   },
   watch: {
     // 监听
     flagVisible: {
-      handler(newValue,oldValue) {
+      handler(newValue, oldValue) {
         // 不能改到父组件传来的props
         this.dialogVisible = newValue
       }
