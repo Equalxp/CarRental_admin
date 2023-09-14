@@ -23,6 +23,7 @@
     "wangeditor": "^3.1.1"
   },
   "devDependencies": {
+    "@types/js-sha1": "^0.6.0",
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-router": "~4.3.0",
