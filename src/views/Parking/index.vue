@@ -18,16 +18,16 @@
               </el-select>
             </el-form-item>
             <el-form-item label="关键字">
-              <el-select placeholder="请选择" class="width-120">
+              <el-select v-model="search_key" placeholder="请选择" @change="searchKeySelect" class="width-120">
                 <el-option label="停车场名称" value="parkingName"></el-option>
                 <el-option label="详细区域" value="address"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-input placeholder="请输入关键字按Enter搜索"></el-input>
+              <el-input v-model="keyword" placeholder="请输入关键字按Enter搜索"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmit">搜索</el-button>
+              <el-button type="primary" @click="getParkingList">搜索</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -54,7 +54,12 @@
             <el-switch v-model="scope.row.status" active-value="2" inactive-value="1" active-color="#13ce66" inactive-color="#ff4949"> </el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="lnglat" label="查看位置"></el-table-column>
+        <el-table-column prop="lnglat" label="查看位置">
+          <template slot-scope="scoped">
+            <!-- {{ scoped.row }} -->
+            <el-button type="success" size="mini" @click="showMap(scoped.row)">查看地图</el-button>
+          </template>
+        </el-table-column>
 
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -71,6 +76,7 @@
           <el-pagination class="pull-right" background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="10" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
         </el-col>
       </el-row>
+      <MapLocation :flagVisible.sync="map_show" />
     </div>
   </div>
 </template>
@@ -78,6 +84,7 @@
 <script>
 // 组件
 import CityArea from "@c/common/cityArea"
+import MapLocation from "../../components/dialog/showMapLocation"
 // API
 import { ParkingList } from "@/api/parking"
 export default {
@@ -98,56 +105,47 @@ export default {
         type: "",
         status: ""
       },
+      search_key: "",
+      keyword: "",
+      // 禁用启用
       parking_status: this.$store.state.config.parking_status,
+      // 停车场类型
       parking_type: this.$store.state.config.parking_type,
-      options: [
-        {
-          value: "zhinan",
-          label: "指南",
-          children: [
-            {
-              value: "shejiyuanze",
-              label: "设计原则",
-              children: [
-                {
-                  value: "yizhi",
-                  label: "一致"
-                },
-                {
-                  value: "fankui",
-                  label: "反馈"
-                },
-                {
-                  value: "xiaolv",
-                  label: "效率"
-                },
-                {
-                  value: "kekong",
-                  label: "可控"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      tableData: []
+      // 数据列表
+      tableData: [],
+      // 地图的显示
+      map_show: false
     }
   },
-  components: { CityArea },
+  components: { CityArea, MapLocation },
   methods: {
     callbackComponent(params) {
       if (params.function) {
         this[params.function](params.data)
       }
     },
+    // select下拉框的触发
+    searchKeySelect(val) {},
     // 请求停车场的列表
     getParkingList() {
       const requestData = {
         pageSize: this.pageSize,
         pageNumber: this.pageNumber
       }
-      const res = ParkingList(requestData)
-      console.log('ParkingList',res)
+      // 过滤筛选 深拷贝
+      const filterData = JSON.parse(JSON.stringify(this.form))
+      for (let key in filterData) {
+        if (filterData[key]) {
+          requestData[key] = filterData[key]
+        }
+      }
+      // 关键字
+      if (this.keyword && this.search_key) {
+        requestData[this.search_key] = this.keyword
+      }
+      console.log("requestData", requestData)
+      // const res = ParkingList(requestData)
+      // console.log("ParkingList", res)
       ParkingList(requestData).then(response => {
         const data = response.data
         // 判断数据是否存在
@@ -160,7 +158,13 @@ export default {
         }
       })
     },
-    /** 页码 */
+    // 编辑
+
+    // 显示地图
+    showMap(data) {
+
+    },
+    // 页码
     handleSizeChange(val) {
       this.pageSize = val
       this.getParkingList()
@@ -168,9 +172,6 @@ export default {
     handleCurrentChange(val) {
       this.pageNumber = val
       this.getParkingList()
-    },
-    onSubmit() {
-      console.log("搜索")
     }
   },
   // DOM元素渲染之前（生命周期）

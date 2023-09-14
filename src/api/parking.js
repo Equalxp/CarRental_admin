@@ -15,3 +15,21 @@ export function ParkingList(data = {}) {
     data
   })
 }
+
+// 停车场修改
+export function ParkingEdit(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/parking/edit/",
+    data
+  })
+}
+
+// 停车场的删除
+export function ParkingDelete(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/parking/delete/",
+    data
+  })
+}

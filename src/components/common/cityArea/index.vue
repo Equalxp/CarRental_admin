@@ -19,7 +19,7 @@ export default {
       cascader_props: {
         lazy: true,
         lazyLoad(node, resolve) {
-          console.log("node", node)
+          // console.log("node", node)
           // 一开始就执行 node为0
           const level = node.level
           // 请求参数
