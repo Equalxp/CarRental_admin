@@ -7,6 +7,7 @@
             <el-form-item label="区域">
               <CityArea ref="cityArea" :cityAreaValue.sync="form.area" @callback="callbackComponent" />
             </el-form-item>
+            <!--  -->
             <el-form-item label="类型">
               <el-select v-model="form.type" placeholder="停车场" class="width-120">
                 <el-option v-for="item in parking_type" :label="item.label" :value="item.value" :key="item.value"></el-option>
@@ -45,8 +46,13 @@
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column type="selection" width="35"></el-table-column>
         <el-table-column prop="parkingName" label="停车场名称"></el-table-column>
-
-        <el-table-column prop="type" label="类型"> </el-table-column>
+        <!-- 类型处理 -->
+        <el-table-column prop="type" label="类型">
+          <template slot-scope="scoped">
+            <!-- 传的值 ｜ 函数 -->
+            <span>{{ scoped.row.type | getType }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="address" label="区域"></el-table-column>
         <el-table-column prop="carsNumber" label="可停放车辆"></el-table-column>
         <el-table-column prop="disabled" label="禁启用">
@@ -64,7 +70,7 @@
         <el-table-column label="操作">
           <template slot-scope="scoped">
             <el-button size="small" type="primary" @click="edit(scoped.row.id)">编辑</el-button>
-            <el-button size="small" type="danger">删除</el-button>
+            <el-button size="small" type="danger" @click="delConfirm(scoped.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -87,10 +93,12 @@
 import CityArea from "@c/common/cityArea"
 import MapLocation from "../../components/dialog/showMapLocation"
 // API
-import { ParkingList } from "@/api/parking"
+import { ParkingList, ParkingDelete } from "@/api/parking"
+let _this
 export default {
   name: "Parking",
   data() {
+    _this = this
     return {
       // 页码
       total: 0,
@@ -116,7 +124,18 @@ export default {
       tableData: [],
       // 地图的显示
       map_show: false,
-      parking_data: {}
+      parking_data: {},
+      table_loading: false
+    }
+  },
+  // 过滤器写法
+  filters: {
+    // 返回文本的类型
+    getType(value) {
+      const data = _this.parking_type.filter(item => item.value == value)
+      if (data && data.lenth > 0) {
+        return data[0].label
+      }
     }
   },
   components: { CityArea, MapLocation },
@@ -148,32 +167,55 @@ export default {
       console.log("requestData", requestData)
       // const res = ParkingList(requestData)
       // console.log("ParkingList", res)
-      ParkingList(requestData).then(response => {
-        const data = response.data
-        // 判断数据是否存在
-        if (data) {
-          this.tableData = data.data
-        }
-        // 页码
-        if (data.total) {
-          this.total = data.total
-        }
-      })
+      ParkingList(requestData)
+        .then(response => {
+          const data = response.data
+          // 判断数据是否存在
+          if (data) {
+            this.tableData = data.data
+          }
+          // 页码
+          if (data.total) {
+            this.total = data.total
+          }
+          this.table_loading = false
+        })
+        .catch(error => {
+          this.table_loading = false
+        })
     },
     // 编辑
     edit(id) {
       this.$router.push({
         name: "ParkingAdd",
         query: {
-          id:id
+          id: id
         }
       })
     },
-    // 显示地图
-    showMap(data) {
+    // 点击查看 显示地图
+    showMap(data) { 
       this.map_show = true
       // parking_data的值 是一行所有的数据
       this.parking_data = data
+    },
+    // 删除
+    delConfirm(id) {
+      this.$confirm("确定删除这个信息嘛", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          ParkingDelete({ id }).then(res => {
+            this.$message({
+              type: "success",
+              message: res.message
+            })
+            this.getParkingList()
+          })
+        })
+        .catch(() => {})
     },
     // 页码
     handleSizeChange(val) {

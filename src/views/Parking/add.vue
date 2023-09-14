@@ -36,6 +36,7 @@
 
       <el-form-item label="位置">
         <div class="address-map">
+          <!-- option配置地图 -->
           <AMap :options="option_map" @callback="callbackComponent" @lonlag="aaa" ref="amap" />
         </div>
       </el-form-item>
@@ -55,7 +56,7 @@
 // AMAP
 import AMap from "../amap/index.vue"
 // API
-import { ParkingAdd, ParkingDetailed } from "@/api/parking"
+import { ParkingAdd, ParkingDetailed, ParkingEdit } from "@/api/parking"
 // 组件
 import CityArea from "@c/common/cityArea"
 export default {
@@ -66,6 +67,7 @@ export default {
       id: this.$route.query.id,
       // 地图配置
       option_map: {
+        // true才回调
         mapLoad: true
       },
       status: this.$store.state.config.parking_status,
@@ -77,8 +79,7 @@ export default {
         type: "",
         carsNumber: "",
         status: "",
-        lnglat: "",
-        content: ""
+        lnglat: ""
       },
       // 表单验证规则
       rules: {
@@ -100,8 +101,12 @@ export default {
       console.log("data", data)
       this.form.lonlag = data.value
     },
+    // 父子组件之间
     callbackComponent(params) {
+      // 子组件传来的函数名  例如:{ function: "mapLoad" }
+      console.log("callbackComponent", params)
       if (params.function) {
+        // 给this上加一个函数
         this[params.function](params.data)
       }
     },
@@ -112,25 +117,23 @@ export default {
       // 通过地址去拿经纬度 调用地图的方法
       this.$refs.amap.setMapCenter(data)
     },
-    /** 地图加载完成 */
+    // 地图加载完成
     mapLoad() {
+      // 等待子组件加载地图完成之后再调用deatil方法
       this.getDetaile()
     },
-    // 获取详情
-    getDetaile() {
-
-    },
+    // 确定按钮的回调
     onSubmit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.addParking()
+          this.id ? this.editParking() : this.addParking()
         } else {
           console.log("error submit!!")
           return false
         }
       })
     },
-    // 新增停车场API 
+    // 新增停车场API
     addParking() {
       this.button_loading = true
       ParkingAdd(this.form)
@@ -146,7 +149,54 @@ export default {
           this.button_loading = false
         })
     },
-    // 重置表单 
+    // 修改停车场
+    editParking() {
+      let requestData = JSON.parse(JSON.stringify(this.form))
+      this.button_loading = true
+      requestData.id = this.id
+      ParkingEdit(requestData)
+        .then(res => {
+          this.$message({
+            type: "primary",
+            message: res.message
+          })
+          this.button_loading = false
+          this.$router.push({
+            name: "ParkingIndex"
+          })
+        })
+        .catch(error => {
+          this.button_loading = false
+        })
+    },
+    // 获取详情
+    getDetaile() {
+      // 没有id 就不去请求
+      if (!this.id) {
+        return false
+      }
+      // 地图和接口之间的异步加载 让一方先加载完成
+      ParkingDetailed({ id: this.id }).then(res => {
+        // console.log("ParkingDetailed",res)
+        const data = res.data
+        // 接口请求出来的
+        for (const key in data) {
+          if (Object.keys(this.form).includes(key)) {
+            this.form[key] = data[key]
+          }
+        }
+        // 设置覆物
+        const splitLnglat = data.lnglat.split(",")
+        const lnglat = {
+          lng: splitLnglat[0],
+          lat: splitLnglat[1]
+        }
+        this.$refs.amap.SetMarker(lnglat)
+        // 初始化省市区
+        this.$refs.cityArea.initDefault(data.region)
+      })
+    },
+    // 重置表单
     reset(formName) {
       this.$refs[formName].resetFields()
       // 清除 cityAray 的值
@@ -154,10 +204,14 @@ export default {
       // 清除地图覆盖物
       this.$refs.amap.clearMarker()
     },
-    // 获取经纬度 
+    // 获取经纬度
     getLnglat(data) {
       this.form.lnglat = data.lnglat.value
-    }
+    },
+    
+  },
+  beforeMount() {
+    this.getDetaile()
   },
   components: { AMap, CityArea }
 }

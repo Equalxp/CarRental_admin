@@ -20,7 +20,7 @@ export default {
     },
     data: {
       type: Object,
-      default: () => ({})
+      default: () => {}
     }
   },
   data() {
@@ -44,7 +44,7 @@ export default {
           lat: splitLnglat[1]
         }
         // 渲染之后再打点
-        this.$refs.aMap.setMarker(lnglat)
+        this.$refs.aMap.SetMarker(lnglat)
       })
     },
     close() {

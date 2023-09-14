@@ -1,6 +1,6 @@
 <template>
   <div class="amap-wrap">
-    <el-amap vid="amapContainer" :events="events" class="amap-demo"> </el-amap>
+    <el-amap vid="amapContainer" :events="events" class="amap-demo"></el-amap>
   </div>
 </template>
 
@@ -25,7 +25,7 @@ export default {
     // lazyAMapApiLoaderInstance 加载高德地图的api
     lazyAMapApiLoaderInstance.load().then(() => {
       // 调用函数
-      this.mapCreate();
+      this.mapCreate()
       this.map.on("click", e => {
         const lnglat = getLngLat(e)
         // 更新经纬度
@@ -45,18 +45,21 @@ export default {
   },
   methods: {
     // 创建地图
-    mapCreate() {
+    mapCreate(params) {
       this.map = new AMap.Map("amapContainer", {
         center: [116.404765, 39.918052],
         //初始化地图层级
-        zoom: this.zoom 
+        zoom: this.zoom
       })
+      // 查看地图是否完成
       this.map.on("complete", () => {
+        // 加载完就调用mapLoad方法
         this.mapLoad()
       })
     },
-    // 地图加载完成
+    // 地图加载完成 去执行父组件里面的方法
     mapLoad() {
+      // console.log("00909", this.options)
       if (this.options.mapLoad) {
         this.$emit("callback", {
           function: "mapLoad"
@@ -78,10 +81,11 @@ export default {
     },
     // 清除点覆盖物
     clearMarker() {
-      amapClearMarker
+      amapClearMarker(this.map)
     }
   },
   props: {
+    // 获取地图的配置
     options: {
       type: Object,
       default: () => {}

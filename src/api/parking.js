@@ -3,7 +3,7 @@ import service from '../utils/request'
 export function ParkingAdd(data = {}) {
   return service.request({
     method: 'post',
-    url: "/parking/add",
+    url: "/parking/add/",
     data
   })
 }
