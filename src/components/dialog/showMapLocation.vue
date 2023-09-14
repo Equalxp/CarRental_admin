@@ -1,88 +1,73 @@
 <template>
-  <div>
-    <el-dialog title="新增车辆品牌" :visible.sync="dialogVisible" class="cars-dialog-center" @close="close" :close-on-click-modal="false">
-      <el-form :inline="true" :model="form" class="demo-form-inline">
-        <el-form-item label="车辆品牌">
-          <el-input v-model="form.parking_name" placeholder="审批人"></el-input>
-        </el-form-item>
-        <el-form-item label="品牌型号">
-          <el-input v-model="form.parking_name" placeholder="审批人"></el-input>
-        </el-form-item>
-        <el-form-item label="LOGO">
-          <div class="upload-img-wrap">
-            <div class="upload-img">
-              <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1593447137003&di=8e2c8ba51d3018e302c66a0bd851c7e8&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2F4e384e839d6b6e96.jpg" alt />
-            </div>
-            <ul class="img-list">
-              <li>
-                <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1593447137003&di=8e2c8ba51d3018e302c66a0bd851c7e8&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2F4e384e839d6b6e96.jpg" alt />
-              </li>
-            </ul>
-          </div>
-        </el-form-item>
-        <el-form-item label="禁用启用">
-          <el-radio-group v-model="form.resource">
-            <el-radio label="禁用"></el-radio>
-            <el-radio label="启用"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
-  </div>
+  <el-dialog :title="data.parkingName" :visible.sync="dialogVisible" class="cars-dialog-center" @close="close" @opened="opened" :close-on-click-modal="false">
+    <div style="height: 500px;">
+      <!-- 显示地图 -->
+      <AMap ref="aMap" />
+    </div>
+  </el-dialog>
 </template>
 
 <script>
+// AMAP
+import AMap from "@/views/amap"
 export default {
-  name: "showMapLoaction",
-  components: {},
-  data() {
-    return {
-      // dialog
-      dialogVisible: false,
-      form: {
-        parking_name: "",
-        area: "",
-        type: ""
-      },
-      tableData: [
-        {
-          name: "xxx",
-          type: "xxx",
-          area: "xxx",
-          carsNumber: "xxx",
-          disabled: "xxx",
-          location: "xxx"
-        }
-      ]
-    }
-  },
+  name: "",
+  components: { AMap },
   props: {
-    // props接收父组件传来的值
     flagVisible: {
       type: Boolean,
       default: false
+    },
+    data: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      // 弹窗显示/关闭标记
+      dialogVisible: false
     }
   },
   methods: {
-    // 反向修改
+    // dailog
+    opened() {
+      // 关闭之后又创建地图
+      this.$refs.aMap.mapCreate()
+      // 调DOM元素的方法时，要确保DOM元素已被加载完成
+      // 用nextTick 在dom元素渲染完成之后执行 再调用地图
+      this.$nextTick(() => {
+        // DOM元素渲染完成后执行 获取经纬度
+        const splitLnglat = this.data.lnglat.split(",")
+        const lnglat = {
+          lng: splitLnglat[0],
+          lat: splitLnglat[1]
+        }
+        // 渲染之后再打点
+        this.$refs.aMap.setMarker(lnglat)
+      })
+    },
     close() {
+      // 销毁
+      this.$refs.aMap.mapDestroy()
       this.$emit("update:flagVisible", false)
     }
   },
   watch: {
-    // 监听
     flagVisible: {
       handler(newValue, oldValue) {
-        // 不能改到父组件传来的props
         this.dialogVisible = newValue
       }
     }
+    //// 监听数据变化了
+    // parking_data: {
+    //     handler(newValue, oldValue) {
+    //         console.log('newValuenewValuenewValuenewValue')
+    //         console.log(newValue)
+    //         this.data = newValue
+    //     }
+    // }
   }
 }
 </script>
-
-<style></style>
+<style lang="scss" scoped></style>

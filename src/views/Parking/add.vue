@@ -15,24 +15,28 @@
       </el-form-item>
 
       <el-form-item label="类型">
-        <el-radio-group v-model="form.resource">
-          <el-radio v-for="item in type" :label="item.value" :key="item.value">{{ item.label }}</el-radio>
+        <el-radio-group v-model="form.type">
+          <el-radio v-for="item in type" :label="item.value" :key="item.value">
+            {{ item.label }}
+          </el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="可停放车辆" prop="carsNumber">
-        <el-input v-model.number="form.carsNumber"> </el-input>
+        <el-input v-model.number="form.carsNumber"></el-input>
       </el-form-item>
 
       <el-form-item label="禁启用" prop="status">
         <el-radio-group v-model="form.status">
-          <el-radio v-for="item in status" :label="item.value" :key="item.value">{{ item.label }}</el-radio>
+          <el-radio v-for="item in status" :label="item.value" :key="item.value">
+            {{ item.label }}
+          </el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="位置">
         <div class="address-map">
-          <AMap @callback="callbackComponent" @lonlag="aaa" ref="amap" />
+          <AMap :options="option_map" @callback="callbackComponent" @lonlag="aaa" ref="amap" />
         </div>
       </el-form-item>
 
@@ -51,13 +55,19 @@
 // AMAP
 import AMap from "../amap/index.vue"
 // API
-import { ParkingAdd } from "@/api/parking"
+import { ParkingAdd, ParkingDetailed } from "@/api/parking"
 // 组件
 import CityArea from "@c/common/cityArea"
 export default {
   name: "ParkingAdd",
   data() {
     return {
+      // id
+      id: this.$route.query.id,
+      // 地图配置
+      option_map: {
+        mapLoad: true
+      },
       status: this.$store.state.config.parking_status,
       type: this.$store.state.config.parking_type,
       form: {
@@ -102,6 +112,14 @@ export default {
       // 通过地址去拿经纬度 调用地图的方法
       this.$refs.amap.setMapCenter(data)
     },
+    /** 地图加载完成 */
+    mapLoad() {
+      this.getDetaile()
+    },
+    // 获取详情
+    getDetaile() {
+
+    },
     onSubmit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -112,7 +130,7 @@ export default {
         }
       })
     },
-    /** 新增停车场API */
+    // 新增停车场API 
     addParking() {
       this.button_loading = true
       ParkingAdd(this.form)
@@ -128,7 +146,7 @@ export default {
           this.button_loading = false
         })
     },
-    /** 重置表单 */
+    // 重置表单 
     reset(formName) {
       this.$refs[formName].resetFields()
       // 清除 cityAray 的值
@@ -136,7 +154,7 @@ export default {
       // 清除地图覆盖物
       this.$refs.amap.clearMarker()
     },
-    /** 获取经纬度 */
+    // 获取经纬度 
     getLnglat(data) {
       this.form.lnglat = data.lnglat.value
     }

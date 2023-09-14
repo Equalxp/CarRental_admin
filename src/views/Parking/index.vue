@@ -62,8 +62,8 @@
         </el-table-column>
 
         <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="small" type="primary">编辑</el-button>
+          <template slot-scope="scoped">
+            <el-button size="small" type="primary" @click="edit(scoped.row.id)">编辑</el-button>
             <el-button size="small" type="danger">删除</el-button>
           </template>
         </el-table-column>
@@ -76,7 +76,8 @@
           <el-pagination class="pull-right" background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="10" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
         </el-col>
       </el-row>
-      <MapLocation :flagVisible.sync="map_show" />
+      <!-- 传递参数给对话框组件 -->
+      <MapLocation :flagVisible.sync="map_show" :data="parking_data" />
     </div>
   </div>
 </template>
@@ -114,7 +115,8 @@ export default {
       // 数据列表
       tableData: [],
       // 地图的显示
-      map_show: false
+      map_show: false,
+      parking_data: {}
     }
   },
   components: { CityArea, MapLocation },
@@ -159,10 +161,19 @@ export default {
       })
     },
     // 编辑
-
+    edit(id) {
+      this.$router.push({
+        name: "ParkingAdd",
+        query: {
+          id:id
+        }
+      })
+    },
     // 显示地图
     showMap(data) {
-
+      this.map_show = true
+      // parking_data的值 是一行所有的数据
+      this.parking_data = data
     },
     // 页码
     handleSizeChange(val) {

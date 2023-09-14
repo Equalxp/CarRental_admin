@@ -16,6 +16,15 @@ export function ParkingList(data = {}) {
   })
 }
 
+/** 停车场详情 */
+export function ParkingDetailed(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/parking/detailed/",
+    data
+  })
+}
+
 // 停车场修改
 export function ParkingEdit(data = {}) {
   return service.request({
