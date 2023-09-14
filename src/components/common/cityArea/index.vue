@@ -100,6 +100,7 @@ export default {
       type: String,
       default: ""
     },
+    // 是否交互
     mapLocation: {
       type: Boolean,
       default: false

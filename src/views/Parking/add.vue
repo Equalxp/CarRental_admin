@@ -6,7 +6,7 @@
       </el-form-item>
 
       <el-form-item label="区域">
-        <!-- 单向数据流 -->
+        <!-- 单向数据流 props传入的数据 -->
         <CityArea :cityAreaValue.sync="form.area" :mapLocation="true"  @callback="callbackComponent" />
       </el-form-item>
 
