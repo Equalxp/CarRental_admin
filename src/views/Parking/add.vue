@@ -10,6 +10,10 @@
         <CityArea ref="cityArea" :cityAreaValue.sync="form.area" :mapLocation="true" @callback="callbackComponent" />
       </el-form-item>
 
+      <el-form-item label="详细地址" prop="address">
+        <el-input v-model="form.address"></el-input>
+      </el-form-item>
+
       <el-form-item label="类型">
         <el-radio-group v-model="form.resource">
           <el-radio v-for="item in type" :label="item.value" :key="item.value">{{ item.label }}</el-radio>
@@ -54,17 +58,12 @@ export default {
   name: "ParkingAdd",
   data() {
     return {
-      status: [
-        { label: "禁用", value: 1 },
-        { label: "启用", value: 2 }
-      ],
-      type: [
-        { label: "室内", value: 1 },
-        { label: "室外", value: 2 }
-      ],
+      status: this.$store.state.config.parking_status,
+      type: this.$store.state.config.parking_type,
       form: {
         parkingName: "",
         area: "",
+        address: "",
         type: "",
         carsNumber: "",
         status: "",
@@ -78,6 +77,7 @@ export default {
           { required: true, message: "数量不能为空", trigger: "change" },
           { type: "number", message: "请输入数字" }
         ],
+        address: [{ required: true, message: "详情地址不能为空", trigger: "change" }],
         area: [{ required: true, message: "请选择省市区", trigger: "change" }],
         lnglat: [{ required: true, message: "经纬度不能为空", trigger: "change" }]
       },
