@@ -208,7 +208,6 @@ export default {
     getLnglat(data) {
       this.form.lnglat = data.lnglat.value
     },
-    
   },
   beforeMount() {
     this.getDetaile()

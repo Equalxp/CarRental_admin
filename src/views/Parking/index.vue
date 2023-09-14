@@ -42,6 +42,20 @@
       </el-row>
     </div>
     <!-- 表格数据 -->
+    <TableData :config="table_config">
+      <!-- 禁启用 -->
+      <template v-slot:status>
+        
+      </template>
+      <!-- 查看地图 -->
+      <template>
+
+      </template>
+      <!-- 操作 -->
+      <template>
+        
+      </template>
+    </TableData>
     <div>
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column type="selection" width="35"></el-table-column>
@@ -92,6 +106,7 @@
 // 组件
 import CityArea from "@c/common/cityArea"
 import MapLocation from "../../components/dialog/showMapLocation"
+import TableData from "../../components/tableData/index"
 // API
 import { ParkingList, ParkingDelete } from "@/api/parking"
 let _this
@@ -100,6 +115,61 @@ export default {
   data() {
     _this = this
     return {
+      // 表格配置
+      table_config: {
+        thead: [
+          { label: "停车场名称", prop: "parkingName" },
+          {
+            label: "类型",
+            prop: "type",
+            type: "function",
+            // 回调 处理交互的东西
+            callback: (row, prop) => {
+              // 直接用key拿值
+              const data = this.parking_type_json[row[prop]]
+              if (data) {
+                // 回调的返回值
+                return data.label
+              }
+            }
+          },
+          {
+            label: "区域",
+            prop: "address",
+            type: "function",
+            callback: (row, prop) => {
+              let address = row[prop]
+              let addressInfo = ""
+              if (address) {
+                let split = address.split(",")
+                addressInfo += split[0]
+                // 街道
+                if (split[1]) {
+                  // 子组件里面用v-html去解析
+                  addressInfo += `<br/>${split[1]}`
+                }
+              }
+              return addressInfo
+            }
+          },
+          { label: "可停放车辆", prop: "carsNumber" },
+          {
+            label: "禁启用",
+            prop: "status",
+            type: "slot",
+            // 具名插槽
+            slotName: "status",
+          },
+          {
+            label: "查看位置",
+            prop: "lnglat",
+          },
+          {
+            label: "操作",
+          }
+        ],
+        url: "/parking/list/"
+      },
       // 页码
       total: 0,
       // 当前页码
@@ -120,6 +190,8 @@ export default {
       parking_status: this.$store.state.config.parking_status,
       // 停车场类型
       parking_type: this.$store.state.config.parking_type,
+      // 停车场json
+      parking_type_json: this.$store.state.config.parking_type_json,
       // 数据列表
       tableData: [],
       // 地图的显示
@@ -132,13 +204,15 @@ export default {
   filters: {
     // 返回文本的类型
     getType(value) {
+      // console.log(_this.parking_type)
       const data = _this.parking_type.filter(item => item.value == value)
       if (data && data.lenth > 0) {
+        // 数字0/1 -> 室内室外 ... 封装了
         return data[0].label
       }
     }
   },
-  components: { CityArea, MapLocation },
+  components: { CityArea, MapLocation, TableData },
   methods: {
     callbackComponent(params) {
       if (params.function) {
@@ -164,9 +238,9 @@ export default {
       if (this.keyword && this.search_key) {
         requestData[this.search_key] = this.keyword
       }
-      console.log("requestData", requestData)
+      // console.log("requestData", requestData)
       // const res = ParkingList(requestData)
-      // console.log("ParkingList", res)
+      // console.log("ParkingList_index", res)
       ParkingList(requestData)
         .then(response => {
           const data = response.data
@@ -194,7 +268,7 @@ export default {
       })
     },
     // 点击查看 显示地图
-    showMap(data) { 
+    showMap(data) {
       this.map_show = true
       // parking_data的值 是一行所有的数据
       this.parking_data = data
