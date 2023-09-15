@@ -1,5 +1,15 @@
 <template>
   <div class="parking-add">
+    <VueForm :formItem="form_item" :formHandler="form_handler">
+      <template v-slot:city>
+        <CityArea ref="cityArea" :mapLocation="true" :cityAreaValue.sync="form.area" @callback="callbackComponent" />
+      </template>
+       <template v-slot:amap>
+        <div class="address-map">
+          <AMap ref="amap" :options="option_map" @callback="callbackComponent" />
+        </div>
+      </template>
+    </VueForm>
     <el-form ref="form" :rules="rules" :model="form" label-width="120px">
       <el-form-item label="停车场名称" prop="parkingName">
         <el-input v-model="form.parkingName"></el-input>
@@ -37,7 +47,7 @@
       <el-form-item label="位置">
         <div class="address-map">
           <!-- option配置地图 -->
-          <AMap :options="option_map" @callback="callbackComponent" @lonlag="aaa" ref="amap" />
+          <AMap :options="option_map" @callback="callbackComponent" @lonlag="aaaa" ref="amap" />
         </div>
       </el-form-item>
 
@@ -59,10 +69,36 @@ import AMap from "../amap/index.vue"
 import { ParkingAdd, ParkingDetailed, ParkingEdit } from "@/api/parking"
 // 组件
 import CityArea from "@c/common/cityArea"
+import VueForm from "@c/form/index"
 export default {
   name: "ParkingAdd",
   data() {
     return {
+      // 表单配置
+      form_item: [
+        { type: "Input", label: "停车场名称", placeholder: "请输入停车场名称", prop: "parkingName", width: "200px" },
+        { type: "Slot", slotName: "city", prop: "area", value: [], label: "区域" },
+        { type: "Input", label: "详细地址", placeholder: "请输入详细地址", prop: "address" },
+        {
+          type: "Radio",
+          label: "类型",
+          prop: "type",
+          options: this.$store.state.config.parking_type
+        },
+        { type: "Input", label: "可停放车辆", placeholder: "请输入数字类型", prop: "carsNumber" },
+        {
+          type: "Radio",
+          label: "禁启用",
+          prop: "status",
+          options: this.$store.state.config.radio_disabled
+        },
+        { type: "Slot", slotName: "amap", label: "位置" },
+        { type: "Input", label: "经纬度", placeholder: "请输入详细地址", prop: "lnglat", disabled: true }
+      ],
+      form_handler: [
+        { label: "确定", key: "submit", type: "danger", handler: () => this.aaa() },
+        { label: "重置", key: "reset" }
+      ],
       // id
       id: this.$route.query.id,
       // 地图配置
@@ -70,8 +106,8 @@ export default {
         // true才回调
         mapLoad: true
       },
-      status: this.$store.state.config.parking_status,
-      type: this.$store.state.config.parking_type,
+      status: this.$store.state.config.radio_disabled,
+      type: this.$store.state.config.radio_disabled,
       form: {
         parkingName: "",
         area: "",
@@ -97,7 +133,13 @@ export default {
     }
   },
   methods: {
-    aaa(data) {
+    aaa() {
+      alert(111)
+    },
+    bbb() {
+      alert(222)
+    },
+    aaaa(data) {
       console.log("data", data)
       this.form.lonlag = data.value
     },
@@ -207,12 +249,16 @@ export default {
     // 获取经纬度
     getLnglat(data) {
       this.form.lnglat = data.lnglat.value
-    },
+    }
   },
   beforeMount() {
     this.getDetaile()
   },
-  components: { AMap, CityArea }
+  components: {
+    AMap,
+    CityArea,
+    VueForm
+  }
 }
 </script>
 

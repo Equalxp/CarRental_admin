@@ -123,6 +123,7 @@ export default {
           type: "success",
           message: response.message
         })
+        console.log("要清空")
         // 清空数据回显
         this.reset("form")
       })
@@ -142,6 +143,7 @@ export default {
         })
         this.reset("form")
       })
+      // 请求成功之后都要刷新列表 再次请求列表数据
     },
     // 重置表单
     reset(formName) {

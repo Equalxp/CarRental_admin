@@ -46,7 +46,7 @@
       <!-- 禁启用 -->
       <template v-slot:status="slotData"> 
         <!-- 封装switchChange -->
-        <el-switch @change="switchChange(slotData.data)" v-model="slotData.data.status" active-value="2" inactive-value="1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        <el-switch @change="switchChange(slotData.data)" v-model="slotData.data.status" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
       </template>
       <!-- 查看地图  slotData是插槽传出来的-->
       <template v-slot:lnglat="slotData">
@@ -131,9 +131,9 @@ export default {
       search_key: "",
       keyword: "",
       // 禁用启用
-      parking_status: this.$store.state.config.parking_status,
+      parking_status: this.$store.state.config.radio_disabled,
       // 停车场类型
-      parking_type: this.$store.state.config.parking_type,
+      parking_type: this.$store.state.config.radio_disabled,
       // 地图的显示
       map_show: false,
       parking_data: {},

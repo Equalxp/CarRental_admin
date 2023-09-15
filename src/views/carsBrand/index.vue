@@ -5,18 +5,10 @@
         <el-col :span="18">
           <el-form :inline="true" :model="form" class="demo-form-inline" label-width="100px">
             <el-form-item label="车辆品牌">
-              <el-select v-model="form.type" placeholder="选择品牌">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域342二" value="beijing"></el-option>
-                <el-option label="区23二" value="beijing"></el-option>
-                <el-option label="区域3" value="beijing"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="品牌型号">
-              <el-input v-model="form.parking_name" placeholder="审批人"></el-input>
+              <el-input v-model="form.brand" placeholder="请输入品牌"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmit">搜索</el-button>
+              <el-button type="primary" @click="search">搜索</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -46,7 +38,7 @@
     <!-- 父->子 单项数据流 -->
     <!-- <addCarsBrand :id='data_id' :flagVisible.sync="dialog_show" /> -->
     <!-- props传递数据过去 -->
-    <addCarsBrand :data='data_brand' :flagVisible.sync="dialog_show" />
+    <addCarsBrand :data="data_brand" :flagVisible.sync="dialog_show" />
   </div>
 </template>
 
@@ -68,7 +60,8 @@ export default {
       form: {
         parking_name: "",
         area: "",
-        type: ""
+        type: "",
+        brand: ""
       },
       table_config: {
         thead: [
@@ -76,7 +69,7 @@ export default {
             label: "Logo",
             prop: "imgUrl",
             type: "image",
-            imgWidth: 100
+            imgWidth: 150
           },
           {
             label: "车辆品牌",
@@ -101,7 +94,7 @@ export default {
             width: 200
           }
         ],
-        // url列表文件
+        // url列表文件 loadData会半默认请求这个
         url: "brandList",
         data: {
           pageSize: 10,
@@ -151,8 +144,8 @@ export default {
     // 编辑 传递对象
     edit(data) {
       // this.data_brand = data
-      this.data_brand = Object.assign({},data)
-      console.log('111');
+      this.data_brand = Object.assign({}, data)
+      console.log("dialog_show", this.dialog_show)
       this.dialog_show = true
     },
     // 禁启用
@@ -180,6 +173,18 @@ export default {
           this.switch_disabled = ""
           // this.switch_flag = false;
         })
+    },
+    // 搜索
+    search() {
+      const requestData = {
+        pageSize: 10,
+        pageNumber: 1
+      }
+      if (this.form.brand) {
+        requestData.brand = this.form.brand
+      }
+      // 搜索
+      this.$refs.table.requestData(requestData)
     },
     onSubmit() {
       console.log("submit!")
