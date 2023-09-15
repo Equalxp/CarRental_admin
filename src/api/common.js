@@ -15,9 +15,9 @@ export function GetCity(data = {}) {
 // 获取table数据
 export function GetTableData(params = {}) {
   // url地址
-  console.log('requestUrl', requestUrl);
+  // console.log('requestUrl', requestUrl);
   // params参数
-  console.log('params.url', params.url);
+  // console.log('params.url', params.url);
   return service.request({
     method: "post",
     url: requestUrl[params.url],

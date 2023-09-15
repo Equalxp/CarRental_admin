@@ -5,16 +5,22 @@
       <el-table-column v-if="table_config.checkbox" type="selection" width="35"></el-table-column>
       <template v-for="item in this.table_config.thead">
         <!-- 回调渲染 -->
-        <el-table-column v-if="item.type === 'function'" :key="item.prop" :prop="item.prop" :label="item.label">
+        <el-table-column v-if="item.type === 'function'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
           <template slot-scope="scope">
             <span v-html="item.callback && item.callback(scope.row, item.prop)"></span>
           </template>
         </el-table-column>
-        <!-- 插槽的渲染 -->
-        <el-table-column v-else-if="item.type === 'slot'" :key="item.prop" :prop="item.prop" :label="item.label">
+        <!-- 插槽的渲染  -->
+        <el-table-column v-else-if="item.type === 'slot'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
           <template slot-scope="scope">
             <!-- 具名插槽 slot等着template带v-slot名字填进来   -->
             <slot :name="item.slotName" :data="scope.row"></slot>
+          </template>
+        </el-table-column>
+        <!-- 图片显示 -->
+        <el-table-column v-else-if="item.type === 'image'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
+          <template slot-scope="scope">
+            <img src="scope.row.imgUrl" :width="scope.row.imgWidth || 50" alt="" />
           </template>
         </el-table-column>
         <!-- 纯文本渲染 -->
@@ -37,7 +43,7 @@ export default {
   name: "TableComponent",
   data() {
     return {
-      // 加载提示
+      // 表格加载提示 请求完之后就不用加载了
       loading_table: true,
       // tableData
       table_data: [],
@@ -73,8 +79,9 @@ export default {
         url: this.table_config.url,
         data: this.table_config.data
       }
+      // 请求之前跑
       this.loading_table = true
-      // 去发请求
+      // 去发请求 封装好的
       GetTableData(requestData)
         .then(response => {
           const data = response.data
@@ -89,6 +96,7 @@ export default {
           })
           // 页面
           this.total = data.total
+          // 请求完成之后
           this.loading_table = false
         })
         .catch(error => {
@@ -98,7 +106,6 @@ export default {
     // 给父组件调用的方法
     requestData(params = "") {
       if (params) {
-        // 业务逻辑
         // 处理业务逻辑
         this.table_config.data = params
       }
@@ -118,6 +125,10 @@ export default {
     config: {
       type: Object,
       default: () => {}
+    },
+    id: {
+      type: String,
+      default: null
     }
   },
   // watch检查数据

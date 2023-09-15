@@ -28,93 +28,162 @@
       </el-row>
     </div>
     <!-- 表格数据 -->
-    <div>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column type="selection" width="35"></el-table-column>
-        <el-table-column prop="name" label="LOGO" width="180"> </el-table-column>
-        <el-table-column prop="type" label="车辆品牌" width="180"> </el-table-column>
-        <el-table-column prop="area" label="车辆型号"> </el-table-column>
-        <el-table-column prop="disabled" label="禁用启用">
-          <template slot-scope="scope">
-            <el-switch v-model="scope.row.disabled" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="small" type="primary">编辑</el-button>
-            <el-button size="small" type="danger">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+    <TableData ref="table" :config="table_config">
+      <!-- 禁用启用 -->
+      <template v-slot:status="slotData">
+        <el-switch @change="switchChange(slotData.data)" v-model="slotData.data.status" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      </template>
+      <!-- 操作 -->
+      <template v-slot:operation="slotData">
+        <!-- 传id过去 -->
+        <!-- <el-button size="small" type="primary" @click="edit(slotData.data.id)">编辑</el-button> -->
+        <!-- 直接传递数据 -->
+        <el-button size="small" type="primary" @click="edit(slotData.data)">编辑</el-button>
+        <el-button :loading="slotData.data.id == rowId" size="small" type="danger" @click="delConfirm(slotData.data.id)">删除</el-button>
+      </template>
+    </TableData>
     <!-- 探出框 -->
     <!-- 父->子 单项数据流 -->
-    <addCarsBrand :flagVisible.sync="dialog_show"  />
+    <!-- <addCarsBrand :id='data_id' :flagVisible.sync="dialog_show" /> -->
+    <!-- props传递数据过去 -->
+    <addCarsBrand :data='data_brand' :flagVisible.sync="dialog_show" />
   </div>
 </template>
 
 <script>
+// API
+import { BrandDelete, BrandStatus } from "@/api/brand"
+import TableData from "../../components/tableData/index"
 import addCarsBrand from "../../components/dialog/addCarsBrand.vue"
 export default {
   name: "Parking",
   components: {
-    addCarsBrand
+    addCarsBrand,
+    TableData
   },
   data() {
     return {
       // dialog
-      dialog_show:false,
+      dialog_show: false,
       form: {
         parking_name: "",
         area: "",
         type: ""
       },
-      options: [
-        {
-          value: "zhinan",
-          label: "指南",
-          children: [
-            {
-              value: "shejiyuanze",
-              label: "设计原则",
-              children: [
-                {
-                  value: "yizhi",
-                  label: "一致"
-                },
-                {
-                  value: "fankui",
-                  label: "反馈"
-                },
-                {
-                  value: "xiaolv",
-                  label: "效率"
-                },
-                {
-                  value: "kekong",
-                  label: "可控"
-                }
-              ]
+      table_config: {
+        thead: [
+          {
+            label: "Logo",
+            prop: "imgUrl",
+            type: "image",
+            imgWidth: 100
+          },
+          {
+            label: "车辆品牌",
+            prop: "nameCh",
+            type: "function",
+            callback: (row, prop) => {
+              // console.log("车辆品牌", row)
+              return `${row.nameCh}/${row.nameEn}`
             }
-          ]
+          },
+          {
+            label: "禁启用",
+            prop: "status",
+            type: "slot",
+            // 具名插槽
+            slotName: "status"
+          },
+          {
+            label: "操作",
+            type: "slot",
+            slotName: "operation",
+            width: 200
+          }
+        ],
+        // url列表文件
+        url: "brandList",
+        data: {
+          pageSize: 10,
+          pageNumber: 1
         }
-      ],
-      tableData: [
-        {
-          name: "xxx",
-          type: "xxx",
-          area: "xxx",
-          carsNumber: "xxx",
-          disabled: "xxx",
-          location: "xxx"
-        }
-      ]
+      },
+      // rowId
+      rowId: "",
+      data_id: "",
+      data_brand: {},
+      // switch_disabled
+      switch_disabled: ""
     }
   },
   methods: {
+    // 删除
+    delConfirm(id) {
+      this.$confirm("确定删除这个信息嘛", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.rowId = id
+          BrandDelete({ id })
+            .then(res => {
+              console.log("BrandDelete", res)
+              this.$message({
+                type: "success",
+                message: res.message
+              })
+              this.rowId = ""
+              // 调用子组件table里的方法
+              this.$refs.table.requestData()
+            })
+            .cacth(error => {
+              this.rowId = ""
+            })
+        })
+        .catch(() => {})
+    },
+    // // 编辑 id
+    // edit(id) {
+    //   this.data_id = id
+    //   this.dialog_show = true
+    // },
+    // 编辑 传递对象
+    edit(data) {
+      // this.data_brand = data
+      this.data_brand = Object.assign({},data)
+      console.log('111');
+      this.dialog_show = true
+    },
+    // 禁启用
+    switchChange(data) {
+      console.log("switchChange", data)
+      if (this.switch_flag) {
+        return false
+      }
+      const requestData = {
+        id: data.id,
+        status: data.status
+      }
+      // this.switch_flag = true;
+      this.switch_disabled = data.id // 第一种方式：组件本身的属性处理
+      BrandStatus(requestData)
+        .then(response => {
+          this.$message({
+            type: "success",
+            message: response.message
+          })
+          this.switch_disabled = ""
+          // this.switch_flag = false;
+        })
+        .catch(error => {
+          this.switch_disabled = ""
+          // this.switch_flag = false;
+        })
+    },
     onSubmit() {
       console.log("submit!")
-    },
+    }
   }
 }
 </script>

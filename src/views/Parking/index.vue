@@ -44,8 +44,9 @@
     <!-- 表格数据 -->
     <TableData ref="table" :config="table_config">
       <!-- 禁启用 -->
-      <template v-slot:status="slotData">
-        <el-switch v-model="slotData.data.status" active-value="2" inactive-value="1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <template v-slot:status="slotData"> 
+        <!-- 封装switchChange -->
+        <el-switch @change="switchChange(slotData.data)" v-model="slotData.data.status" active-value="2" inactive-value="1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
       </template>
       <!-- 查看地图  slotData是插槽传出来的-->
       <template v-slot:lnglat="slotData">
@@ -54,7 +55,7 @@
       <!-- 操作 -->
       <template v-slot:operation="slotData">
         <el-button size="small" type="primary" @click="edit(slotData.data.id)">编辑</el-button>
-        <el-button size="small" type="danger" @click="delConfirm(slotData.data.id)">删除</el-button>
+        <el-button :loading="slotData.data.id == rowId" size="small" type="danger" @click="delConfirm(slotData.data.id)">删除</el-button>
       </template>
     </TableData>
     <MapLocation :flagVisible.sync="map_show" :data="parking_data" />
@@ -189,6 +190,7 @@ export default {
         type: "warning"
       })
         .then(() => {
+          this.rowId = id
           ParkingDelete({ id })
             .then(res => {
               this.$message({
@@ -206,8 +208,9 @@ export default {
         })
         .catch(() => {})
     },
-    // 禁启用
+    // 禁启用 
     switchChange(data) {
+      // console.log('switchChange',data);
       if (this.switch_flag) {
         return false
       }
