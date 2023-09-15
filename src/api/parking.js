@@ -16,7 +16,7 @@ export function ParkingList(data = {}) {
   })
 }
 
-/** 停车场详情 */
+// 停车场详情
 export function ParkingDetailed(data = {}) {
   return service.request({
     method: "post",
@@ -39,6 +39,14 @@ export function ParkingDelete(data = {}) {
   return service.request({
     method: "post",
     url: "/parking/delete/",
+    data
+  })
+}
+// 禁启用 
+export function ParkingStatus(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/parking/status/",
     data
   })
 }

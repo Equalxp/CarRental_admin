@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="table_data" border style="width: 100%">
+    <el-table v-loading="loading_table" element-loading-text="加载中" :data="table_data" border style="width: 100%">
       <!-- selection框 -->
       <el-table-column v-if="table_config.checkbox" type="selection" width="35"></el-table-column>
       <template v-for="item in this.table_config.thead">
@@ -13,7 +13,7 @@
         <!-- 插槽的渲染 -->
         <el-table-column v-else-if="item.type === 'slot'" :key="item.prop" :prop="item.prop" :label="item.label">
           <template slot-scope="scope">
-            <!-- 具名插槽 slot等着template带v-slot名字填进来 -->
+            <!-- 具名插槽 slot等着template带v-slot名字填进来   -->
             <slot :name="item.slotName" :data="scope.row"></slot>
           </template>
         </el-table-column>
@@ -21,6 +21,13 @@
         <el-table-column v-else :key="item.prop" :prop="item.prop" :label="item.label"></el-table-column>
       </template>
     </el-table>
+    <el-row class="padding-top-30">
+      <el-col :span="4"><div style="padding: 5px;"></div></el-col>
+      <el-col :span="20">
+        <el-pagination v-if="table_config.pagination" class="pull-right" background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="10" layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
@@ -30,6 +37,8 @@ export default {
   name: "TableComponent",
   data() {
     return {
+      // 加载提示
+      loading_table: true,
       // tableData
       table_data: [],
       // 父组件
@@ -43,7 +52,7 @@ export default {
       // 页码
       total: 0,
       // 当前页码
-      pagination: 1
+      currentPage: 1
     }
   },
   beforeMount() {},
@@ -62,20 +71,47 @@ export default {
       // 发请求的数据
       let requestData = {
         url: this.table_config.url,
-        data: {
-          pageSize: 10,
-          pageNumber: 1
-        }
+        data: this.table_config.data
       }
+      this.loading_table = true
       // 去发请求
-      GetTableData(requestData).then(response => {
-        const data = response.data
-        console.log("GetTableData", response.data)
-        // 判断数据是否存在
-        if (data) {
-          this.table_data = data.data
-        }
-      })
+      GetTableData(requestData)
+        .then(response => {
+          const data = response.data
+          // console.log("GetTableData", response.data)
+          // 判断数据是否存在
+          if (data) {
+            this.table_data = data.data
+          }
+          // 页码
+          this.$nextTick(() => {
+            // 考虑到DOM元素渲染完成时候
+          })
+          // 页面
+          this.total = data.total
+          this.loading_table = false
+        })
+        .catch(error => {
+          this.loading_table = false
+        })
+    },
+    // 给父组件调用的方法
+    requestData(params = "") {
+      if (params) {
+        // 业务逻辑
+        // 处理业务逻辑
+        this.table_config.data = params
+      }
+      this.loadData()
+    },
+    // 页码
+    handleSizeChange(val) {
+      this.table_config.data.pageSize = val
+      this.loadData()
+    },
+    handleCurrentChange(val) {
+      this.table_config.data.pageNumber = val
+      this.loadData()
     }
   },
   props: {
