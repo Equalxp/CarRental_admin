@@ -24,3 +24,21 @@ export function GetTableData(params = {}) {
     data: params.data
   })
 }
+
+// 获取车辆品牌
+export function GetCarsBrand(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/common/getCarsBrand/",
+    data
+  })
+}
+
+// 获取停车场
+export function GetParking(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/common/getParking/",
+    data
+  })
+}

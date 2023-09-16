@@ -110,6 +110,10 @@
 <script>
 // 富文本编辑器
 import Editor from "wangeditor"
+// 组件
+import VueForm from "@c/form";
+// API
+import { GetCarsBrand, GetParking } from "@/api/common";
 export default {
   name: "ParkingAdd",
   data() {
@@ -123,15 +127,23 @@ export default {
         { key4: 111, value4: 222 }
       ],
       form: {
-        energy: 1,
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+        parkingId: "",
+        carsBrandId: "",
+        carsMode: "",
+        carsNumber: "",
+        carsFrameNumber: "",
+        engineNumber: "",
+        carsImg: "",
+        countKm: "",
+        yearCheck: true,
+        gear: 1,
+        energyType: 2,
+        electric: 100,
+        oil: 100,
+        carsAttr: "",
+        content: "",
+        maintainDate: "",
+        status: true
       }
     }
   },
@@ -155,6 +167,6 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import "./style.scss";
 </style>

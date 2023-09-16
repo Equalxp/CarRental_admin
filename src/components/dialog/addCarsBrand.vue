@@ -1,14 +1,8 @@
 <template>
   <div>
     <el-dialog title="新增车辆品牌" :visible.sync="dialogVisible" class="cars-dialog-center" @close="close" @opened="opened" :close-on-click-modal="false">
-      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
-        <el-form-item label="品牌中文" prop="nameCh">
-          <el-input v-model="form.nameCh"></el-input>
-        </el-form-item>
-        <el-form-item label="品牌英文" prop="nameEn">
-          <el-input v-model="form.nameEn"></el-input>
-        </el-form-item>
-        <el-form-item label="LOGO" prop="imgUrl">
+      <VueForm ref="vuForm" :formData="form_data" :formItem="form_item" :formHandler="form_handler">
+        <template v-slot:logo>
           <div class="upload-img-wrap">
             <div class="upload-img">
               <img v-show="logo_current" :src="logo_current" />
@@ -19,38 +13,69 @@
               </li>
             </ul>
           </div>
-        </el-form-item>
-        <el-form-item label="禁启用" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="item in radio_disabled" :key="item.id" :label="item.value">
-              {{ item.label }}
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="danger" @click="submit">确定</el-button>
-        </el-form-item>
-      </el-form>
+        </template>
+        <template> </template>
+      </VueForm>
     </el-dialog>
   </div>
 </template>
 
 <script>
+// 组件
+import VueForm from "@c/form"
 import { BrandLogo, BrandAdd, BrandDetailed, BrandEdit } from "@/api/brand"
 export default {
   name: "",
-  components: {},
+  components: {
+    VueForm
+  },
   data() {
     return {
       // dialog
       dialogVisible: false,
-      form: {
+      // 表单数据
+      form_data: {
         nameCh: "",
         nameEn: "",
         imgUrl: "",
         status: "",
         content: ""
       },
+      // 表单项
+      form_item: [
+        {
+          type: "Input",
+          label: "品牌中文",
+          placeholder: "输入品牌中文",
+          prop: "nameCh"
+        },
+        {
+          type: "Input",
+          label: "品牌英文",
+          placeholder: "输入品牌英文",
+          prop: "nameEn"
+        },
+        {
+          type: "Radio",
+          label: "禁启用",
+          prop: "status",
+          options: this.$store.state.config.radio_disabled
+        },
+        {
+          type: "Slot",
+          slotName: "logo",
+          label: "logo"
+        }
+      ],
+      // 表单按钮
+      form_handler: [
+        {
+          label: "确定",
+          key: "submit",
+          type: "danger",
+          handler: () => this.submit()
+        }
+      ],
       // 状态
       radio_disabled: this.$store.state.config.radio_disabled,
       // 选中的LOGO
@@ -105,9 +130,9 @@ export default {
     getDetailed() {
       // console.log("不用接口", this.data)
       // 请求到的数据 直接赋值
-      this.form = this.data
+      this.form_data = this.data
       this.logo_current = this.data.imgUrl
-      this.form.imgUrl = this.data.imgUrl
+      this.form_data.imgUrl = this.data.imgUrl
     },
     // 提交
     submit() {
@@ -117,22 +142,23 @@ export default {
     // 添加
     add() {
       this.form.imgUrl = this.logo_current
-      BrandAdd(this.form).then(response => {
+      BrandAdd(this.form_data).then(response => {
         // console.log("BrandAdd", response)
         this.$message({
           type: "success",
           message: response.message
         })
-        console.log("要清空")
-        // 清空数据回显
-        this.reset("form")
+        this.close();
+        this.$emit("callbackComponent", {
+          function: "search"
+        })
       })
     },
     // 修改
     edit() {
       //  深拷贝form 修改表单
-      this.form.imgUrl = this.logo_current
-      const requestData = JSON.parse(JSON.stringify(this.form))
+      this.form_data.imgUrl = this.logo_current
+      const requestData = JSON.parse(JSON.stringify(this.form_data))
       // requestData.id = this.id
       // 发请求
       BrandEdit(requestData).then(res => {
@@ -141,18 +167,26 @@ export default {
           type: "success",
           message: response.message
         })
-        this.reset("form")
+        this.close();
+        this.$emit("callbackComponent", {
+          function: "search"
+        })
       })
       // 请求成功之后都要刷新列表 再次请求列表数据
     },
     // 重置表单
     reset(formName) {
-      this.$refs[formName].resetFields()
+      for(let key in this.form_data) {
+        this.form_data[key] = "";
+      }
       // 清除选中的LOGO
       this.logo_current = ""
     },
     // 反向修改
     close() {
+      this.reset("form");
+      // 关闭窗口
+      this.dialogVisible = false;
       this.$emit("update:flagVisible", false)
     }
   },

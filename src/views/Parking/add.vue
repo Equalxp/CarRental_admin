@@ -150,9 +150,9 @@ export default {
   methods: {
     // 表单验证
     formValidate() {
-      // 调用
       this.$refs.vuForm.$refs.form.validate(valid => {
         if (valid) {
+          // 提价表单发请求
           this.id ? this.editParking() : this.addParking();
         } else {
           console.log('error submit!!');
@@ -186,16 +186,16 @@ export default {
       this.getDetaile()
     },
     // 确定按钮的回调
-    onSubmit(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.id ? this.editParking() : this.addParking()
-        } else {
-          console.log("error submit!!")
-          return false
-        }
-      })
-    },
+    // onSubmit(formName) {
+    //   this.$refs[formName].validate(valid => {
+    //     if (valid) {
+    //       this.id ? this.editParking() : this.addParking()
+    //     } else {
+    //       console.log("error submit!!")
+    //       return false
+    //     }
+    //   })
+    // },
     // 新增停车场API
     addParking() {
       this.button_loading = true

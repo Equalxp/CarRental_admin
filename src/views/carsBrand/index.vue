@@ -38,7 +38,7 @@
     <!-- 父->子 单项数据流 -->
     <!-- <addCarsBrand :id='data_id' :flagVisible.sync="dialog_show" /> -->
     <!-- props传递数据过去 -->
-    <addCarsBrand :data="data_brand" :flagVisible.sync="dialog_show" />
+    <addCarsBrand :data="data_brand" :flagVisible.sync="dialog_show" @callbackComponent="callbackComponent" />
   </div>
 </template>
 
@@ -110,6 +110,12 @@ export default {
     }
   },
   methods: {
+    callbackComponent(params) {
+      console.log(params)
+      if (params.function) {
+        this[params.function]()
+      }
+    },
     // 删除
     delConfirm(id) {
       this.$confirm("确定删除这个信息嘛", "提示", {
