@@ -44,7 +44,7 @@
     <!-- 表格数据 -->
     <TableData ref="table" :config="table_config">
       <!-- 禁启用 -->
-      <template v-slot:status="slotData"> 
+      <template v-slot:status="slotData">
         <!-- 封装switchChange -->
         <el-switch @change="switchChange(slotData.data)" v-model="slotData.data.status" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
       </template>
@@ -208,7 +208,7 @@ export default {
         })
         .catch(() => {})
     },
-    // 禁启用 
+    // 禁启用
     switchChange(data) {
       // console.log('switchChange',data);
       if (this.switch_flag) {

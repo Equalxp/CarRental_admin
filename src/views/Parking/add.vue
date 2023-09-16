@@ -1,64 +1,15 @@
 <template>
   <div class="parking-add">
-    <VueForm :formItem="form_item" :formHandler="form_handler">
+    <VueForm ref="vuForm" :formData="form_data" :formItem="form_item" :formHandler="form_handler">
       <template v-slot:city>
-        <CityArea ref="cityArea" :mapLocation="true" :cityAreaValue.sync="form.area" @callback="callbackComponent" />
+        <CityArea ref="cityArea" :mapLocation="true" :cityAreaValue.sync="form_data.area" @callback="callbackComponent" />
       </template>
-       <template v-slot:amap>
+      <template v-slot:amap>
         <div class="address-map">
           <AMap ref="amap" :options="option_map" @callback="callbackComponent" />
         </div>
       </template>
     </VueForm>
-    <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-      <el-form-item label="停车场名称" prop="parkingName">
-        <el-input v-model="form.parkingName"></el-input>
-      </el-form-item>
-
-      <el-form-item prop="area" label="区域">
-        <!-- 单向数据流 props传入的数据 -->
-        <CityArea ref="cityArea" :cityAreaValue.sync="form.area" :mapLocation="true" @callback="callbackComponent" />
-      </el-form-item>
-
-      <el-form-item label="详细地址" prop="address">
-        <el-input v-model="form.address"></el-input>
-      </el-form-item>
-
-      <el-form-item label="类型">
-        <el-radio-group v-model="form.type">
-          <el-radio v-for="item in type" :label="item.value" :key="item.value">
-            {{ item.label }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-
-      <el-form-item label="可停放车辆" prop="carsNumber">
-        <el-input v-model.number="form.carsNumber"></el-input>
-      </el-form-item>
-
-      <el-form-item label="禁启用" prop="status">
-        <el-radio-group v-model="form.status">
-          <el-radio v-for="item in status" :label="item.value" :key="item.value">
-            {{ item.label }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-
-      <el-form-item label="位置">
-        <div class="address-map">
-          <!-- option配置地图 -->
-          <AMap :options="option_map" @callback="callbackComponent" @lonlag="aaaa" ref="amap" />
-        </div>
-      </el-form-item>
-
-      <el-form-item label="经纬度" prop="lnglat">
-        <el-input v-model="form.lnglat"></el-input>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="danger" :loading="button_loading" @click="onSubmit('form')">确定</el-button>
-      </el-form-item>
-    </el-form>
   </div>
 </template>
 
@@ -73,31 +24,104 @@ import VueForm from "@c/form/index"
 export default {
   name: "ParkingAdd",
   data() {
+    // 验证规则
+    let validatePass = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("请输入停车场名称"))
+      } else {
+        callback()
+      }
+    }
+    let validateNumber = (rule, value, callback) => {
+      const regNumber = /^[0-9]*$/
+      if (!value) {
+        callback(new Error("请输入可停放车辆"))
+      } else if (!regNumber.test(value)) {
+        callback(new Error("请输入数字"))
+      } else {
+        callback()
+      }
+    }
     return {
+      // 表单数据配置
+      form_data: {
+        parkingName: "",
+        area: "",
+        address: "",
+        type: "",
+        carsNumber: "",
+        status: "",
+        lnglat: ""
+      },
       // 表单配置
       form_item: [
-        { type: "Input", label: "停车场名称", placeholder: "请输入停车场名称", prop: "parkingName", width: "200px" },
-        { type: "Slot", slotName: "city", prop: "area", value: [], label: "区域" },
-        { type: "Input", label: "详细地址", placeholder: "请输入详细地址", prop: "address" },
+        {
+          type: "Input",
+          label: "停车场名称",
+          placeholder: "请输入停车场名称",
+          prop: "parkingName",
+          width: "200px",
+          // 自定义规则
+          validator: [{ validator: validatePass, trigger: "change" }]
+        },
+        {
+          type: "Slot",
+          slotName: "city",
+          prop: "area",
+          label: "区域"
+        },
+        {
+          type: "Input",
+          label: "详细地址",
+          placeholder: "请输入详细地址",
+          prop: "address",
+          required: true,
+          requiredMsg: "请输入停车场名称"
+        },
         {
           type: "Radio",
           label: "类型",
           prop: "type",
-          options: this.$store.state.config.parking_type
+          options: this.$store.state.config.parking_type,
+          required: true
         },
-        { type: "Input", label: "可停放车辆", placeholder: "请输入数字类型", prop: "carsNumber" },
+        {
+          type: "Input",
+          label: "可停放车辆",
+          placeholder: "请输入数字类型",
+          prop: "carsNumber",
+          validator: [{ validator: validateNumber, trigger: "change" }]
+        },
         {
           type: "Radio",
           label: "禁启用",
           prop: "status",
           options: this.$store.state.config.radio_disabled
         },
-        { type: "Slot", slotName: "amap", label: "位置" },
-        { type: "Input", label: "经纬度", placeholder: "请输入详细地址", prop: "lnglat", disabled: true }
+        {
+          type: "Slot",
+          slotName: "amap",
+          label: "位置"
+        },
+        {
+          type: "Input",
+          label: "经纬度",
+          placeholder: "请输入详细地址",
+          prop: "lnglat",
+          disabled: true
+        }
       ],
       form_handler: [
-        { label: "确定", key: "submit", type: "danger", handler: () => this.aaa() },
-        { label: "重置", key: "reset" }
+        {
+          label: "确定",
+          key: "submit",
+          type: "danger",
+          handler: () => this.formValidate()
+        },
+        {
+          label: "重置",
+          key: "reset"
+        }
       ],
       // id
       id: this.$route.query.id,
@@ -108,15 +132,6 @@ export default {
       },
       status: this.$store.state.config.radio_disabled,
       type: this.$store.state.config.radio_disabled,
-      form: {
-        parkingName: "",
-        area: "",
-        address: "",
-        type: "",
-        carsNumber: "",
-        status: "",
-        lnglat: ""
-      },
       // 表单验证规则
       rules: {
         parkingName: [{ required: true, message: "请输入停车场名称", trigger: "change" }],
@@ -133,11 +148,17 @@ export default {
     }
   },
   methods: {
-    aaa() {
-      alert(111)
-    },
-    bbb() {
-      alert(222)
+    // 表单验证
+    formValidate() {
+      // 调用
+      this.$refs.vuForm.$refs.form.validate(valid => {
+        if (valid) {
+          this.id ? this.editParking() : this.addParking();
+        } else {
+          console.log('error submit!!');
+          return false
+        }
+      })
     },
     aaaa(data) {
       console.log("data", data)
@@ -193,7 +214,7 @@ export default {
     },
     // 修改停车场
     editParking() {
-      let requestData = JSON.parse(JSON.stringify(this.form))
+      let requestData = JSON.parse(JSON.stringify(this.form_data))
       this.button_loading = true
       requestData.id = this.id
       ParkingEdit(requestData)
@@ -223,8 +244,8 @@ export default {
         const data = res.data
         // 接口请求出来的
         for (const key in data) {
-          if (Object.keys(this.form).includes(key)) {
-            this.form[key] = data[key]
+          if (Object.keys(this.form_data).includes(key)) {
+            this.form_data[key] = data[key]
           }
         }
         // 设置覆物
