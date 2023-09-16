@@ -11,9 +11,9 @@
       <el-radio-group v-if="item.type === 'Disabled'" v-model="formData[item.prop]">
         <el-radio v-for="radio in radio_disabled" :label="radio.value" :key="radio.value">{{ radio.label }}</el-radio>
       </el-radio-group>
-      <!-- 省市区 -->
+      <!-- 插槽 -->
       <slot v-if="item.type === 'Slot'" :name="item.slotName" />
-      <!-- 省市区 -->
+      <!-- Radio -->
       <el-radio-group v-if="item.type === 'Radio'" v-model="formData[item.prop]">
         <el-radio v-for="radio in item.options" :label="radio.value" :key="radio.value">{{ radio.label }}</el-radio>
       </el-radio-group>

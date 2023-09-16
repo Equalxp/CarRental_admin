@@ -5,60 +5,52 @@
       <template v-slot:maintain>
         <el-row :gutter="30">
           <el-col :span="6">
-            <el-input v-model="form_data.maintain"> </el-input>
+            <el-input v-model="form_data.maintainDate"> </el-input>
+            <el-date-picker v-model="form_data.maintainDate" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" style="width: 100%;"></el-date-picker>
           </el-col>
           <el-col :span="6">下次保养日期：2020-12-12</el-col>
         </el-row>
       </template>
       <template v-slot:energy>
-        <el-radio-group v-model="form_data.energyType">
-          <el-radio :label="1">电</el-radio>
-          <el-radio :label="2">油</el-radio>
-          <el-radio :label="3">混合动力</el-radio>
+        <!-- radio框 -->
+        <el-radio-group v-model="form_data.energyType" @change="changeEnergyType">
+          <el-radio v-for="item in energyType" :key="item.value" :label="item.value">
+            {{ item.label }}
+          </el-radio>
         </el-radio-group>
+        <!-- 电 -->
         <div class="progress-bar-wrap" v-if="form_data.energyType == 3 || form_data.energyType == 1">
           <span class="label-text">电量：</span>
-          <el-row :gutter="20">
-            <el-col :span="5">
-              <div class="progress-bar">
-                <span style="width: 50%;">
-                  <label>{{ form_data.electric }}%</label>
-                </span>
-              </div>
-            </el-col>
-            <el-col :span="2">
-              <el-input size="small" value="100" v-model="form_data.electric"></el-input>
+          <el-row>
+            <el-col :span="10">
+              <el-slider v-model="form_data.electric" show-input></el-slider>
             </el-col>
           </el-row>
         </div>
+        <!-- 油 -->
         <div class="progress-bar-wrap" v-if="form_data.energyType == 3 || form_data.energyType == 2">
           <span class="label-text">油量：</span>
-          <el-row :gutter="20">
-            <el-col :span="5">
-              <div class="progress-bar">
-                <span style="width: 50%;">
-                  <label>{{ form_data.oil }}%</label>
-                </span>
-              </div>
-            </el-col>
-            <el-col :span="2">
-              <el-input size="small" value="100" v-model="form_data.oil"></el-input>
+          <el-row>
+            <el-col :span="10">
+              <el-slider v-model="form_data.oil" show-input></el-slider>
             </el-col>
           </el-row>
         </div>
       </template>
       <template v-slot:carsAttr>
+        <el-button type="primary" @click="addCarsAttr">添加汽车属性</el-button>
         <div class="cars-attr-list" v-for="(item, index) in cars_attr" :key="item.key">
           <el-row :gutter="10">
             <el-col :span="2">
-              <el-input value="100"></el-input>
+              <!-- 双向绑定 属性的 key和value -->
+              <el-input v-model="item.attr_key"></el-input>
             </el-col>
             <el-col :span="3">
-              <el-input value="100"></el-input>
+              <el-input v-model="item.attr_value"></el-input>
             </el-col>
             <el-col :span="6">
-              <el-button type="primary" v-if="index == 0" @click="addCarsAttr">+</el-button>
-              <el-button v-else>-</el-button>
+              <!-- index可以用于表示当前删除的那个 -->
+              <el-button @click="delCarsAttr(index)">删除</el-button>
             </el-col>
           </el-row>
         </div>
@@ -75,6 +67,7 @@ import Editor from "wangeditor"
 // 组件
 import VueForm from "@c/form"
 // API
+import { CarsAdd } from "../../api/car"
 import { GetCarsBrand, GetParking } from "@/api/common"
 export default {
   name: "ParkingAdd",
@@ -83,14 +76,11 @@ export default {
   },
   data() {
     return {
+      // 能源类型
+      energyType: this.$store.state.config.energyType,
+      cars_attr: [],
       // 富文本对象
       editor: null,
-      cars_attr: [
-        { key1: 111, value1: 222 },
-        { key2: 111, value2: 222 },
-        { key3: 111, value3: 222 },
-        { key4: 111, value4: 222 }
-      ],
       form_data: {
         parkingId: "",
         carsBrandId: "",
@@ -117,7 +107,7 @@ export default {
           placeholder: "请选择车辆品牌",
           prop: "carsBrandId",
           // 自有的私有属性 默认拿的是value/label
-          select_vlaue: "id", 
+          select_vlaue: "id",
           select_label: "nameCh",
           options: []
         },
@@ -126,7 +116,7 @@ export default {
           label: "停车场",
           placeholder: "请选择停车场",
           // 自有的私有属性
-          select_vlaue: "id", 
+          select_vlaue: "id",
           select_label: "parkingName",
           prop: "parkingId",
           options: []
@@ -219,17 +209,30 @@ export default {
   },
   methods: {
     formValidate() {
-      console.log("submit!")
-    },
-    onSubmit() {
-      console.log("submit!")
+      this.formatCarsAttr()
+      // console.log("填写的所有数据", this.form_data)
+      // 发请求
+      CarsAdd(this.form_data).then(response => {
+        console.log("CarsAdd", response)
+        if (response.resCode == 0) {
+          this.$message({
+            type: "success",
+            message: response.message
+          })
+        } else {
+          this.$message({
+            type: "error",
+            message: response.message
+          })
+        }
+      })
     },
     // 获取车辆品牌
     async GetCarsBrand() {
       const { data: res } = await GetCarsBrand()
       // console.log("GetCarsBrand", res)
       if (res.data) {
-        // 数据 
+        // 数据
         const carsBrand = this.form_item.filter(item => {
           // 过滤拿到汽车品牌的对象
           return item.prop == "carsBrandId"
@@ -244,7 +247,7 @@ export default {
     // 获取停车场
     async GetParking() {
       const { data: res } = await GetParking()
-      console.log("GetParking", res)
+      // console.log("GetParking", res)
       if (res.data) {
         const parking = this.form_item.filter(item => item.prop == "parkingId")
         if (parking.length > 0) {
@@ -254,14 +257,46 @@ export default {
     },
     // 添加车辆属性
     addCarsAttr() {
-      this.cars_attr.push({ key4: 111, value4: 222 })
+      this.cars_attr.push({ attr_key: "", attr_value: "" })
+    },
+    // 删除车辆属性
+    delCarsAttr(index) {
+      // 第一个参数：指定数组索引位置， 第二参数：从指定位置开始删除多少个。删除数组的指定元素
+      this.cars_attr.splice(index, 1)
+    },
+    // 单独处理添加的汽车属性
+    formatCarsAttr() {
+      const data = this.cars_attr
+      // 不存在
+      if (data && data.length == 0) {
+        return false
+      }
+      const carsAttr = {}
+      // forin
+      data.forEach(item => {
+        // key存在才添加 // 重复属性需要优化给出交互提示
+        if (item.attr_key) {
+          // key/value
+          carsAttr[item.attr_key] = item.attr_value
+        }
+      })
+      // 自定义新增的属性和属性值
+      // console.log('formatCarsAttr',carsAttr)
+      // 添加到form_data上
+      this.form_data.carsAttr = JSON.stringify(carsAttr)
     },
     // 创建富文本对象
     createEditor() {
       this.editor = new Editor(this.$refs.editorDom)
-      this.editor.customConfig.onchange = html => {}
+      this.editor.customConfig.onchange = html => {
+        this.form_data.content = html
+      }
       // 创建富文本实例
       this.editor.create()
+    },
+    changeEnergyType(value) {
+      this.form_data.oil = 0
+      this.form_data.electric = 0
     }
   }
 }
@@ -296,6 +331,7 @@ export default {
   }
 }
 .cars-attr-list {
+  margin-top: 15px;
   margin-bottom: 15px;
   overflow: hidden;
 }

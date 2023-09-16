@@ -1,6 +1,6 @@
 <template>
   <!-- 级联选择器 动态加载 -->
-  <el-cascader :class="{ 'cascader-input': initValueFlag }" :placeholder="initValue" v-model="value" :options="cascader_options" :props="cascader_props" @change="changeValue"></el-cascader>
+  <el-cascader filterable :class="{ 'cascader-input': initValueFlag }" :placeholder="initValue" v-model="value" :options="cascader_options" :props="cascader_props" @change="changeValue"></el-cascader>
 </template>
 
 <script>
