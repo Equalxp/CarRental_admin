@@ -109,7 +109,8 @@ export default {
           // 自有的私有属性 默认拿的是value/label
           select_vlaue: "id",
           select_label: "nameCh",
-          options: []
+          options: [],
+          required: true
         },
         {
           type: "Select",
@@ -119,31 +120,36 @@ export default {
           select_vlaue: "id",
           select_label: "parkingName",
           prop: "parkingId",
-          options: []
+          options: [],
+          required: true
         },
         {
           type: "Input",
           label: "车辆型号",
           placeholder: "请输入车辆型号",
-          prop: "carsMode"
+          prop: "carsMode",
+          required: true
         },
         {
           type: "Input",
           label: "车牌号",
           placeholder: "请输入车牌号",
-          prop: "carsNumber"
+          prop: "carsNumber",
+          required: true
         },
         {
           type: "Input",
           label: "车架号",
           placeholder: "请输入车架号",
-          prop: "carsFrameNumber"
+          prop: "carsFrameNumber",
+          required: true
         },
         {
           type: "Input",
           label: "发动机号",
           placeholder: "请输入发动机号",
-          prop: "engineNumber"
+          prop: "engineNumber",
+          required: true
         },
         {
           type: "Radio",
@@ -211,18 +217,23 @@ export default {
     formValidate() {
       this.formatCarsAttr()
       // console.log("填写的所有数据", this.form_data)
-      // 发请求
-      CarsAdd(this.form_data).then(response => {
-        console.log("CarsAdd", response)
-        if (response.resCode == 0) {
-          this.$message({
-            type: "success",
-            message: response.message
-          })
-        } else {
-          this.$message({
-            type: "error",
-            message: response.message
+      // 发请求 表单验证
+      this.$refs.vuForm.$refs.form.validate(valid => {
+        if (valid) {
+          CarsAdd(this.form_data).then(response => {
+            console.log("CarsAdd", response)
+            if (response.resCode == 0) {
+              this.$message({
+                type: "success",
+                message: response.message
+              })
+            } else {
+              console.log("CarsAdd error submit!!")
+              this.$message({
+                type: "error",
+                message: response.message
+              })
+            }
           })
         }
       })

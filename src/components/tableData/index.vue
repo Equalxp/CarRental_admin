@@ -7,6 +7,8 @@
         <!-- 回调渲染 -->
         <el-table-column v-if="item.type === 'function'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
           <template slot-scope="scope">
+            <!-- scope表示这一行所有的数据的键值 -->
+            <!-- {{ scope.row }} -->
             <span v-html="item.callback && item.callback(scope.row, item.prop)"></span>
           </template>
         </el-table-column>
@@ -20,11 +22,12 @@
         <!-- 图片显示 -->
         <el-table-column v-else-if="item.type === 'image'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
           <template slot-scope="scope">
-            <img src="scope.row.imgUrl" :width="scope.row.imgWidth || 50" alt="" />
+            <img :src="scope.row[item.prop]" :width="item.imgWidth || 50" alt="" />
+            <!-- <img src="scope.row.imgUrl" :width="scope.row.imgWidth || 50" alt="" /> -->
           </template>
         </el-table-column>
         <!-- 纯文本渲染 -->
-        <el-table-column v-else :key="item.prop" :prop="item.prop" :label="item.label"></el-table-column>
+        <el-table-column v-else :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
       </template>
     </el-table>
     <el-row class="padding-top-30">
@@ -122,6 +125,7 @@ export default {
     }
   },
   props: {
+    // props接收 thead url pageData
     config: {
       type: Object,
       default: () => {}

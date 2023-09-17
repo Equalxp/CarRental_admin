@@ -6,6 +6,7 @@
       </template>
       <template v-slot:amap>
         <div class="address-map">
+          <!-- 子组件 -->
           <AMap ref="amap" :options="option_map" @callback="callbackComponent" />
         </div>
       </template>
@@ -108,6 +109,7 @@ export default {
           label: "经纬度",
           placeholder: "请输入详细地址",
           prop: "lnglat",
+          // 不可修改
           disabled: true
         }
       ],

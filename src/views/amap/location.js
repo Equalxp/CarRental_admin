@@ -1,4 +1,4 @@
-// 根据中文找坐标
+// 根据中文地址找坐标 切换地图框的中心点
 export function addressSetMapCenter(address, map) {
   const geocoder = new AMap.Geocoder()
   console.log('address.address', address.address);

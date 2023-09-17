@@ -28,10 +28,10 @@ export default {
       this.mapCreate()
       this.map.on("click", e => {
         const lnglat = getLngLat(e)
-        // 更新经纬度
+        // 更新经纬度 是个对象
         this.lnglat = lnglat
-        // console.log("lnglat", lnglat)
-        // 子组件调用父组件方法 传参数出去
+        console.log("点击获取经纬度", lnglat)
+        // 子组件触发父组件中的自定义事件 并且传递数据
         this.$emit("callback", {
           function: "getLnglat",
           data: {
@@ -73,6 +73,7 @@ export default {
     // 让父组件调用这个方法
     setMapCenter(value) {
       // console.log("value", value) // value也是中文地址
+      // 根据地址找坐标 切换中心点
       addressSetMapCenter(value, this.map)
     },
     // 设置点覆盖物
