@@ -26,6 +26,10 @@
             <!-- <img src="scope.row.imgUrl" :width="scope.row.imgWidth || 50" alt="" /> -->
           </template>
         </el-table-column>
+        <!-- 操作 -->
+        <!-- <el-table-column>
+
+        </el-table-column> -->
         <!-- 纯文本渲染 -->
         <el-table-column v-else :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
       </template>

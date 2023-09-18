@@ -17,6 +17,11 @@
       <el-radio-group v-if="item.type === 'Radio'" v-model="formData[item.prop]">
         <el-radio v-for="radio in item.options" :label="radio.value" :key="radio.value">{{ radio.label }}</el-radio>
       </el-radio-group>
+      <!-- 富文本编辑器 -->
+      <template v-if="item.type === 'Wangeditor'">
+        <!--  -->
+        <Wangeditor :content.sync="formData[item.prop]" :isClear="wangeditorClear" ref="wangeditor" :value="formData[item.prop]" />
+      </template>
     </el-form-item>
     <!-- 按钮 -->
     <el-form-item>
@@ -29,9 +34,11 @@
 <script>
 // 省市区
 import CityArea from "@c/common/cityArea"
+// 富文本
+import Wangeditor from "@c/common/wangeditor";
 export default {
   name: "Form",
-  components: { CityArea },
+  components: { CityArea, Wangeditor },
   props: {
     labelWidth: {
       type: String,
@@ -58,11 +65,22 @@ export default {
       type_msg: {
         Input: "请输入",
         Radio: "请选择",
-        Select: "请选择",
-      }
+        Select: "请选择"
+      },
+      // 清除富文本 true/false
+      wangeditorClear: false
     }
   },
   methods: {
+    // 重置表单
+    resetForm() {
+      // 清除其他文本
+      this.$refs.form.resetFidlds()
+      // 清除富文本内容
+      if(this.$refs.Wangeditor) {
+        this.wangeditorClear = !this.wangeditorClear
+      }
+    },
     initFormData() {
       this.formItem.forEach(item => {
         if (item.required) {

@@ -34,7 +34,7 @@
         </el-col>
         <el-col :span="3">
           <div class="pull-right">
-            <router-link to="/parkingAdd">
+            <router-link to="/carsAdd">
               <el-button type="danger">新增停车场</el-button>
             </router-link>
           </div>
@@ -49,8 +49,8 @@
       </template>
       <!-- 操作 -->
       <template v-slot:operation="slotData">
-        <el-button type="danger" size="small" @click="edit(slotData.data.id)">编辑</el-button>
-        <el-button size="small" :loading="slotData.data.id == rowId" @click="delConfirm(slotData.data.id)">删除</el-button>
+        <el-button type="primary" size="small" @click="edit(slotData.data.id)">编辑</el-button>
+        <el-button type="danger" size="small" :loading="slotData.data.id == rowId" @click="delConfirm(slotData.data.id)">删除</el-button>
       </template>
     </TableData>
     <MapLocation :flagVisible.sync="map_show" :data="parking_data" />
@@ -63,11 +63,11 @@ import CityArea from "@c/common/cityArea"
 import MapLocation from "../../components/dialog/showMapLocation"
 import TableData from "../../components/tableData/index"
 // API
-import { ParkingStatus, ParkingDelete } from "@/api/parking"
+import { CarsStatus, CarsDelete } from "../../api/car"
 // common
 import { address, yearCheckType, energyType } from "@/utils/common"
 export default {
-  name: "Parking",
+  name: "Cars",
   data() {
     return {
       // 表格配置
@@ -175,7 +175,7 @@ export default {
     // 编辑
     edit(id) {
       this.$router.push({
-        name: "ParkingAdd",
+        name: "CarsAdd",
         query: {
           id: id
         }
@@ -196,7 +196,7 @@ export default {
       })
         .then(() => {
           this.rowId = id
-          ParkingDelete({ id })
+          CarsDelete({ id })
             .then(res => {
               this.$message({
                 type: "success",
@@ -223,9 +223,10 @@ export default {
         id: data.id,
         status: data.status
       }
+      // console.log("switchChange", requestData)
       // this.switch_flag = true;
       this.switch_disabled = data.id // 第一种方式：组件本身的属性处理
-      ParkingStatus(requestData)
+      CarsStatus(requestData)
         .then(response => {
           this.$message({
             type: "success",

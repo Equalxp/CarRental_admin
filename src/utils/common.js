@@ -23,10 +23,10 @@ export function parkingType(value) {
 // 年检
 export function yearCheckType(value) {
   const data = store.state.config.year_check;
-  console.log(value);
-  console.log(data);
+  // console.log(value);
+  // console.log(data);
   const filterData = data.filter(item => item.value == value)
-  console.log('yearCheckType', filterData);
+  // console.log('yearCheckType', filterData);
   if (filterData.length > 0) {
     return filterData[0].label
   }

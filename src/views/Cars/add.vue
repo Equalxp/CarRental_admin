@@ -55,19 +55,14 @@
           </el-row>
         </div>
       </template>
-      <template v-slot:content>
-        <div ref="editorDom" style="text-align: left;"></div>
-      </template>
     </VueForm>
   </div>
 </template>
 <script>
-// 富文本编辑器
-import Editor from "wangeditor"
 // 组件
 import VueForm from "@c/form"
 // API
-import { CarsAdd } from "../../api/car"
+import { CarsAdd, CarsDetailed, CarsEdit } from "../../api/car"
 import { GetCarsBrand, GetParking } from "@/api/common"
 export default {
   name: "ParkingAdd",
@@ -76,6 +71,8 @@ export default {
   },
   data() {
     return {
+      // id
+      id: this.$route.query.id,
       // 能源类型
       energyType: this.$store.state.config.energyType,
       cars_attr: [],
@@ -190,8 +187,8 @@ export default {
           label: "车辆属性"
         },
         {
-          type: "Slot",
-          slotName: "content",
+          // 封装富文本了
+          type: "Wangeditor",
           prop: "content",
           label: "车辆描述"
         }
@@ -205,13 +202,12 @@ export default {
       carsBrandList: []
     }
   },
-  mounted() {
-    this.createEditor()
-  },
+  mounted() {},
   beforeMount() {
     // 掉接口请求数据
     this.GetCarsBrand()
     this.GetParking()
+    this.getDetailed()
   },
   methods: {
     formValidate() {
@@ -220,22 +216,63 @@ export default {
       // 发请求 表单验证
       this.$refs.vuForm.$refs.form.validate(valid => {
         if (valid) {
-          CarsAdd(this.form_data).then(response => {
-            console.log("CarsAdd", response)
-            if (response.resCode == 0) {
-              this.$message({
-                type: "success",
-                message: response.message
-              })
-            } else {
-              console.log("CarsAdd error submit!!")
-              this.$message({
-                type: "error",
-                message: response.message
-              })
-            }
-          })
+          this.id ? this.edit() : this.add()
+        } else {
+          console.log("error submit!!")
+          return false
         }
+      })
+    },
+    // 编辑车辆
+    edit() {
+      CarsEdit({ ...this.form_data, id: this.id }).then(response => {
+        this.$message({
+          message: response.message,
+          type: "success"
+        })
+      })
+    },
+    // 新增车辆
+    add() {
+      CarsAdd(this.form_data).then(response => {
+        this.$message({
+          message: response.message,
+          type: "success"
+        })
+        this.$refs.vueForm.resetForm()
+        this.cars_attr = []
+        this.form_data.content = ""
+      })
+    },
+    // 获取详情
+    async getDetailed() {
+      if (!this.id) {
+        return false
+      }
+      CarsDetailed({ id: this.id }).then(response => {
+        // console.log("CarsDetailed", response.data)
+        const data = response.data
+        if (!data) {
+          return false
+        }
+        for (let key in data) {
+          // form_data有的key都data赋值过去
+          if (Object.keys(this.form_data).includes(key)) {
+            this.form_data[key] = data[key]
+          }
+        }
+        const carsAttr = JSON.parse(data.carsAttr)
+        const arr = []
+        // 自定义添加的attr 请求下来是json
+        // console.log("CarsDetailed", response.data.carsAttr)
+        for (let key in carsAttr) {
+          const json = {}
+          json.attr_key = key
+          json.attr_value = carsAttr[key]
+          // { attr_key: "", attr_value: "" }
+          arr.push(json)
+        }
+        this.cars_attr = arr
       })
     },
     // 获取车辆品牌
@@ -266,6 +303,7 @@ export default {
         }
       }
     },
+
     // 添加车辆属性
     addCarsAttr() {
       this.cars_attr.push({ attr_key: "", attr_value: "" })
@@ -295,15 +333,6 @@ export default {
       // console.log('formatCarsAttr',carsAttr)
       // 添加到form_data上
       this.form_data.carsAttr = JSON.stringify(carsAttr)
-    },
-    // 创建富文本对象
-    createEditor() {
-      this.editor = new Editor(this.$refs.editorDom)
-      this.editor.customConfig.onchange = html => {
-        this.form_data.content = html
-      }
-      // 创建富文本实例
-      this.editor.create()
     },
     changeEnergyType(value) {
       this.form_data.oil = 0
