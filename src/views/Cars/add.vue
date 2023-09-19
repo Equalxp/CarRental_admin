@@ -225,7 +225,11 @@ export default {
     },
     // 编辑车辆
     edit() {
-      CarsEdit({ ...this.form_data, id: this.id }).then(response => {
+      const requestData = JSON.parse(JSON.stringify(this.form_data))
+      requestData.id = this.id
+      // 解构 / JSON
+      // CarsEdit({ ...this.form_data, id: this.id }).then(response => {
+      CarsEdit(requestData).then(response => {
         this.$message({
           message: response.message,
           type: "success"
@@ -239,9 +243,12 @@ export default {
           message: response.message,
           type: "success"
         })
-        this.$refs.vueForm.resetForm()
+        this.$refs.vuForm.resetForm()
         this.cars_attr = []
         this.form_data.content = ""
+        this.$router.push({
+          name: "CarsIndex"
+        })
       })
     },
     // 获取详情

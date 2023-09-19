@@ -1,5 +1,7 @@
 <template>
   <div>
+    <FormSearch :formItme="form_item" @callbackComponent="callbackComponent" />
+    <!-- <FormSearch :formItem="form_item" :formData="form_data"></FormSearch> -->
     <el-table v-loading="loading_table" element-loading-text="加载中" :data="table_data" border style="width: 100%">
       <!-- selection框 -->
       <el-table-column v-if="table_config.checkbox" type="selection" width="35"></el-table-column>
@@ -27,9 +29,22 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <!-- <el-table-column>
-
-        </el-table-column> -->
+        <el-table-column v-else-if="item.type === 'operation'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
+          <template slot-scope="scope">
+            <!--编辑-->
+            <template v-if="item.default && item.default.editButton">
+              <el-button v-if="item.default.editButtonEvent" type="primary" size="small" @click="edit(scope.row[item.default.id || 'id'], item.default.editButtonLink)">编辑</el-button>
+              <!-- 编辑按钮去跳转路由 -->
+              <router-link v-else :to="{ name: item.default.editButtonLink, query: { id: scope.row[item.default.id || 'id'] } }" class="mr-10">
+                <el-button type="primary" size="small">编辑</el-button>
+              </router-link>
+            </template>
+            <!--删除-->
+            <el-button size="small" type="danger" v-if="item.default && item.default.deleteButton" :loading="scope.row.id == rowId" @click="delConfirm(scope.row.id)">删除</el-button>
+            <!--额外-->
+            <slot v-if="item.slotName" :name="item.slotName" :data="scope.row"></slot>
+          </template>
+        </el-table-column>
         <!-- 纯文本渲染 -->
         <el-table-column v-else :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
       </template>
@@ -44,10 +59,17 @@
   </div>
 </template>
 <script>
+// 组件
+import FormSearch from "../formSearch/index.vue"
 // API
-import { GetTableData } from "@/api/common"
+import { GetTableData, Delete } from "@/api/common"
+// API
+// import { CarsDelete } from "@/api/cars"
 export default {
   name: "TableComponent",
+  components: {
+    FormSearch
+  },
   data() {
     return {
       // 表格加载提示 请求完之后就不用加载了
@@ -65,11 +87,30 @@ export default {
       // 页码
       total: 0,
       // 当前页码
-      currentPage: 1
+      currentPage: 1,
+      // rowId
+      rowId: "",
+      // form_item
+      form_item: [
+        { label: "城市", type: "City" },
+        { label: "类型", prop: "parkingType", type: "Select", width: "120px", options: "parking_type" },
+        { label: "禁启用", prop: "status", type: "Select", width: "120px", options: "radio_disabled" },
+        { label: "关键字", type: "Keyword" }
+      ],
+      form_data: {}
     }
   },
   beforeMount() {},
   methods: {
+    callbackComponent(params) {
+      this[params.function](params.data)
+    },
+    search(data) {
+      const searchData = data
+      searchData.pageNumber = 1
+      searchData.pageSize = 10
+      this.requestData(searchData)
+    },
     initConfig() {
       for (let key in this.config) {
         // 只有传来的才添加进去
@@ -80,8 +121,8 @@ export default {
       // 配置完成后开始读取接口数据
       this.loadData()
     },
+    // 发请求的数据
     loadData() {
-      // 发请求的数据
       let requestData = {
         url: this.table_config.url,
         data: this.table_config.data
@@ -126,6 +167,44 @@ export default {
     handleCurrentChange(val) {
       this.table_config.data.pageNumber = val
       this.loadData()
+    },
+    // 删除
+    delConfirm(id) {
+      this.$confirm("确定删除此信息", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.rowId = id
+          let requestData = {
+            url: this.table_config.url + "Delete",
+            data: { id }
+          }
+          Delete(requestData)
+            .then(response => {
+              this.$message({
+                type: "success",
+                message: response.message
+              })
+              this.rowId = ""
+              // 调用子组件的方法
+              this.loadData()
+            })
+            .cacth(error => {
+              this.rowId = ""
+            })
+        })
+        .catch(() => {})
+    },
+    // 编辑
+    edit(id, routerNmae) {
+      this.$router.push({
+        name: routerNmae,
+        query: {
+          id
+        }
+      })
     }
   },
   props: {
@@ -150,4 +229,8 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.mr-10 {
+  margin-right: 10px;
+}
+</style>

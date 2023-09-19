@@ -52,11 +52,6 @@
       <template v-slot:lnglat="slotData">
         <el-button type="success" size="mini" @click="showMap(slotData.data)">查看地图</el-button>
       </template>
-      <!-- 操作 -->
-      <template v-slot:operation="slotData">
-        <el-button size="small" type="primary" @click="edit(slotData.data.id)">编辑</el-button>
-        <el-button :loading="slotData.data.id == rowId" size="small" type="danger" @click="delConfirm(slotData.data.id)">删除</el-button>
-      </template>
     </TableData>
     <MapLocation :flagVisible.sync="map_show" :data="parking_data" />
   </div>
@@ -108,8 +103,12 @@ export default {
           },
           {
             label: "操作",
-            type: "slot",
-            slotName: "operation"
+            type: "operation",
+            default: {
+              deleteButton: true,
+              editButton: true,
+              editButtonLink: "ParkingAdd"
+            }
           }
         ],
         // url列表文件

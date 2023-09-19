@@ -35,7 +35,7 @@
 // 省市区
 import CityArea from "@c/common/cityArea"
 // 富文本
-import Wangeditor from "@c/common/wangeditor";
+import Wangeditor from "@c/common/wangeditor"
 export default {
   name: "Form",
   components: { CityArea, Wangeditor },
@@ -75,9 +75,9 @@ export default {
     // 重置表单
     resetForm() {
       // 清除其他文本
-      this.$refs.form.resetFidlds()
+      this.$refs.form.resetFields()
       // 清除富文本内容
-      if(this.$refs.Wangeditor) {
+      if (this.$refs.Wangeditor) {
         this.wangeditorClear = !this.wangeditorClear
       }
     },

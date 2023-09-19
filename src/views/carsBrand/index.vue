@@ -31,7 +31,6 @@
         <!-- <el-button size="small" type="primary" @click="edit(slotData.data.id)">编辑</el-button> -->
         <!-- 直接传递数据 -->
         <el-button size="small" type="primary" @click="edit(slotData.data)">编辑</el-button>
-        <el-button :loading="slotData.data.id == rowId" size="small" type="danger" @click="delConfirm(slotData.data.id)">删除</el-button>
       </template>
     </TableData>
     <!-- 探出框 -->
@@ -44,7 +43,7 @@
 
 <script>
 // API
-import { BrandDelete, BrandStatus } from "@/api/brand"
+import { BrandStatus } from "@/api/brand"
 import TableData from "../../components/tableData/index"
 import addCarsBrand from "../../components/dialog/addCarsBrand.vue"
 export default {
@@ -89,9 +88,12 @@ export default {
           },
           {
             label: "操作",
-            type: "slot",
+            type: "operation",
             slotName: "operation",
-            width: 200
+            width: 200,
+            default: {
+              deleteButton: true
+            },
           }
         ],
         // url列表文件 loadData会半默认请求这个
@@ -116,33 +118,8 @@ export default {
         this[params.function]()
       }
     },
-    // 删除
-    delConfirm(id) {
-      this.$confirm("确定删除这个信息嘛", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.rowId = id
-          BrandDelete({ id })
-            .then(res => {
-              console.log("BrandDelete", res)
-              this.$message({
-                type: "success",
-                message: res.message
-              })
-              this.rowId = ""
-              // 调用子组件table里的方法
-              this.$refs.table.requestData()
-            })
-            .cacth(error => {
-              this.rowId = ""
-            })
-        })
-        .catch(() => {})
-    },
-    // // 编辑 id
+    // 删除 组件封装了
+    // 编辑 id
     // edit(id) {
     //   this.data_id = id
     //   this.dialog_show = true
@@ -151,7 +128,7 @@ export default {
     edit(data) {
       // this.data_brand = data
       this.data_brand = Object.assign({}, data)
-      console.log("dialog_show", this.dialog_show)
+      // console.log("dialog_show", this.dialog_show)
       this.dialog_show = true
     },
     // 禁启用
