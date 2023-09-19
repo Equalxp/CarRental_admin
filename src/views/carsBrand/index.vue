@@ -93,7 +93,7 @@ export default {
             width: 200,
             default: {
               deleteButton: true
-            },
+            }
           }
         ],
         // url列表文件 loadData会半默认请求这个
@@ -101,6 +101,21 @@ export default {
         data: {
           pageSize: 10,
           pageNumber: 1
+        },
+        form_item: [{ label: "车辆品牌", prop: "brand", type: "Input", width: "150px", options: "parking_type", placeholder: "请输入车辆品牌" }],
+        form_handler: [
+          {
+            label: "新增车辆品牌",
+            prop: "add",
+            type: "danger",
+            element: "button",
+            handler: () => {
+              this.dialog_show = true
+            }
+          }
+        ],
+        form_config: {
+          resetButton: true
         }
       },
       // rowId

@@ -11,7 +11,7 @@
       <div v-if="item.type === 'City'">
         <CityArea ref="city" :cityAreaValue.sync="city_value" />
       </div>
-      <!-- city-->
+      <!-- keyword-->
       <div v-if="item.type === 'Keyword'">
         <KeyWord ref="keyword" :options="['address', 'parkingName']" :value.sync="keyword" />
       </div>
@@ -21,9 +21,18 @@
     <!-- 按钮 -->
     <el-form-item>
       <el-button type="danger" @click="search">搜索</el-button>
-      <el-button v-for="item in formHandler" :key="item.key" :type="item.type" @click="item.handler && item.handler()">
-        {{ item.label }}
-      </el-button>
+      <el-button type="danger" @click="reset" v-if="formConfig.resetButton">重置</el-button>
+      <!-- 其他按钮 -->
+      <template v-for="item in formHandler">
+        <el-button v-if="item.element === 'link'" :key="item.key" :type="item.type">
+          <router-link :to="item.router" style="color: #fff">
+            {{ item.label }}
+          </router-link>
+        </el-button>
+        <el-button v-if="item.element === 'button'" :key="item.key" :type="item.type" @click="item.handler && item.handler()">
+          {{ item.label }}
+        </el-button>
+      </template>
     </el-form-item>
   </el-form>
 </template>
@@ -43,6 +52,10 @@ export default {
     formHandler: {
       type: Array,
       default: () => []
+    },
+    formConfig: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -76,6 +89,18 @@ export default {
         data: searchData
       })
     },
+    // 重置
+    reset() {
+      this.$refs.form.resetFields()
+      // 其他组件需要单独处理
+      if (this.$refs.city[0]) {
+        this.$refs.city[0].clear()
+      }
+      // 关键字
+      if (this.$refs.keyword[0]) {
+        this.$refs.keyword[0].clear()
+      }
+    },
     // 初始化表单数据
     initFormData() {
       this.formItme.forEach(item => {
@@ -94,13 +119,15 @@ export default {
         }
       })
       this.form_data = felid
+      // parkingType|status = ''
+      // console.log("initFormFelid", this.form_data)
     },
-    // 下拉选项
     selectOption(data) {
       const options = this.$store.state.config[data.options]
       if (options) {
         data.options = options
       }
+      // console.log("selectOption", data.options)
     }
   },
   watch: {

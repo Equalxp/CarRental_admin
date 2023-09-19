@@ -32,13 +32,18 @@ export default {
       })
       this.search_options = optionsItem
     },
-    /** 输入时 */
+    // 输入时
     inputEnter() {
       let keyword = {}
       keyword.key = this.search_key
       keyword.value = this.search_value
       this.$emit("update:value", keyword)
-    }
+    },
+    // 清除
+    clear() {
+      this.search_key = ""
+      this.search_value = ""
+    } 
   },
   props: {
     options: {

@@ -36,6 +36,11 @@ export default {
             type: "image"
           },
           {
+            label: "车辆图片",
+            prop: "carsImg",
+            type: "image"
+          },
+          {
             label: "年检",
             prop: "yearCheck",
             type: "function",
@@ -81,14 +86,20 @@ export default {
         data: {
           pageSize: 10,
           pageNumber: 1
+        },
+        form_item: [
+          { label: "城市", type: "City" },
+          { label: "类型", prop: "parkingType", type: "Select", width: "120px", options: "parking_type" },
+          { label: "禁启用", prop: "status", type: "Select", width: "120px", options: "radio_disabled" },
+          { label: "关键字", type: "Keyword" }
+        ],
+        form_handler: [
+          { label: "新增", prop: "add", type: "success", element: "link", router: "/carsAdd", color: "#fff" }
+          // { label: "下载", prop: "down", type: "success", element: "button", handler: () => this.aaaa() }
+        ],
+        form_config: {
+          resetButton: true
         }
-      },
-      // 筛选
-      form: {
-        // parking_name: "",
-        area: "",
-        type: "",
-        status: ""
       },
       switch_disabled: "",
       switch_flag: false,
