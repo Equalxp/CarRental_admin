@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="filter-form">
+    <!-- <div class="filter-form">
       <el-row>
         <el-col :span="18">
           <el-form :inline="true" :model="form" class="demo-form-inline" label-width="100px">
@@ -18,7 +18,7 @@
           </div>
         </el-col>
       </el-row>
-    </div>
+    </div> -->
     <!-- 表格数据 -->
     <TableData ref="table" :config="table_config">
       <!-- 禁用启用 -->
@@ -35,9 +35,9 @@
     </TableData>
     <!-- 探出框 -->
     <!-- 父->子 单项数据流 -->
-    <!-- <addCarsBrand :id='data_id' :flagVisible.sync="dialog_show" /> -->
+    <!-- <AddCarsBrand :id='data_id' :flagVisible.sync="dialog_show" /> -->
     <!-- props传递数据过去 -->
-    <addCarsBrand :data="data_brand" :flagVisible.sync="dialog_show" @callbackComponent="callbackComponent" />
+    <AddCarsBrand :data="data_brand" :flagVisible.sync="dialog_show" @callbackComponent="callbackComponent" />
   </div>
 </template>
 
@@ -45,11 +45,11 @@
 // API
 import { BrandStatus } from "@/api/brand"
 import TableData from "../../components/tableData/index"
-import addCarsBrand from "../../components/dialog/addCarsBrand.vue"
+import AddCarsBrand from "../../components/dialog/addCarsBrand.vue"
 export default {
   name: "Parking",
   components: {
-    addCarsBrand,
+    AddCarsBrand,
     TableData
   },
   data() {
@@ -148,7 +148,7 @@ export default {
     },
     // 禁启用
     switchChange(data) {
-      console.log("switchChange", data)
+      // console.log("switchChange", data)
       if (this.switch_flag) {
         return false
       }

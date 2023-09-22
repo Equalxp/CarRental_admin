@@ -49,3 +49,12 @@ export function Delete(params = {}) {
     data: params.data
   })
 }
+
+// 获取qiniu的token
+export function GetQiniuToken(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/uploadImgToken/",
+    data
+  })
+}

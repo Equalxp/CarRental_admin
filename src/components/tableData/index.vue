@@ -1,12 +1,7 @@
 <template>
   <div>
-    <FormSearch
-      v-if="table_config.search_form"
-      :formItme="table_config.form_item"
-      :formHandler="table_config.form_handler"
-      :formConfig="table_config.form_config"
-      @callbackComponent="callbackComponent"
-    />
+    <FormSearch v-if="table_config.search_form" :formItme="table_config.form_item" :formHandler="table_config.form_handler" :formConfig="table_config.form_config" @callbackComponent="callbackComponent" />
+    <slot name="content"></slot>
     <el-table v-loading="loading_table" element-loading-text="加载中" :data="table_data" border style="width: 100%">
       <!-- selection框 -->
       <el-table-column v-if="table_config.checkbox" type="selection" width="35"></el-table-column>
@@ -30,6 +25,7 @@
         <el-table-column v-else-if="item.type === 'image'" :key="item.prop" :prop="item.prop" :label="item.label" :width="item.width">
           <template slot-scope="scope">
             <img :src="scope.row[item.prop]" :width="item.imgWidth || 50" alt="" />
+            <!-- <img src="./logo.png" :width="item.imgWidth || 50" height="50" alt="" /> -->
             <!-- <img src="scope.row.imgUrl" :width="scope.row.imgWidth || 50" alt="" /> -->
           </template>
         </el-table-column>
@@ -78,11 +74,13 @@ export default {
   data() {
     return {
       // 表格加载提示 请求完之后就不用加载了
-      loading_table: true,
+      loading_table: false,
       // tableData
       table_data: [],
       // 父组件
       table_config: {
+        // 初始化是否请求接口
+        isRequest: true,
         thead: [],
         checkbox: true,
         url: "",
@@ -118,6 +116,7 @@ export default {
       this.requestData(searchData)
     },
     initConfig() {
+      // this.conifg是父组件props传的
       for (let key in this.config) {
         // 只有传来的才添加进去
         if (Object.keys(this.table_config).includes(key)) {
@@ -125,7 +124,7 @@ export default {
         }
       }
       // 配置完成后开始读取接口数据
-      this.loadData()
+      this.table_config.isRequest && this.loadData();
     },
     // 发请求的数据
     loadData() {
@@ -160,7 +159,7 @@ export default {
     // 给父组件调用的方法
     requestData(params = "") {
       if (params) {
-        // 处理业务逻辑
+        // 处理业务逻辑 传来的id...
         this.table_config.data = params
       }
       this.loadData()

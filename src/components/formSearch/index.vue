@@ -12,8 +12,8 @@
         <CityArea ref="city" :cityAreaValue.sync="city_value" />
       </div>
       <!-- keyword-->
-      <div v-if="item.type === 'Keyword'">
-        <KeyWord ref="keyword" :options="['address', 'parkingName']" :value.sync="keyword" />
+      <div v-if="item.type === 'Keyword'" style="width: 300px">
+        <KeyWord ref="keyword" :options="item.options" :value.sync="keyword" />
       </div>
       <!-- slot -->
       <slot v-if="item.type === 'Slot'" :name="item.slotName" />

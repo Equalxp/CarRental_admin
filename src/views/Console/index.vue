@@ -9,18 +9,6 @@ export default {
   components: {},
   props: {},
   setup(props, { root }) {
-    // 监听
-    // watch(xxx, () => {})
-    // 生命周期
-    // onBeforeMount(() => {})
-    // onMounted(() => {})
-    // onBeforeUpdate(() => {})
-    // onUpdated(() => {})
-    // onBeforeUnmount(() => {})
-    // onUnmounted(() => {})
-    // onErrorCaptured(() => {})
-    // onRenderTracked(() => {})
-    // onRenderTriggered(() => {})
     return {}
   }
 }

@@ -76,8 +76,7 @@ export default {
           label: "详细地址",
           placeholder: "请输入详细地址",
           prop: "address",
-          required: true,
-          requiredMsg: "请输入停车场名称"
+          required: true
         },
         {
           type: "Radio",
@@ -133,7 +132,7 @@ export default {
         mapLoad: true
       },
       status: this.$store.state.config.radio_disabled,
-      type: this.$store.state.config.radio_disabled,
+      type: this.$store.state.config.parking_type,
       // 表单验证规则
       rules: {
         parkingName: [{ required: true, message: "请输入停车场名称", trigger: "change" }],
@@ -154,22 +153,23 @@ export default {
     formValidate() {
       this.$refs.vuForm.$refs.form.validate(valid => {
         if (valid) {
-          // 提价表单发请求
-          this.id ? this.editParking() : this.addParking();
+          console.log("idid", this.id)
+          // 提交表单发请求
+          this.id ? this.editParking() : this.addParking()
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!")
           return false
         }
       })
     },
-    aaaa(data) {
-      console.log("data", data)
-      this.form.lonlag = data.value
-    },
+    // aaaa(data) {
+    //   console.log("data", data)
+    //   this.form.lonlag = data.value
+    // },
     // 父子组件之间
     callbackComponent(params) {
-      // 子组件传来的函数名  例如:{ function: "mapLoad" }
-      console.log("callbackComponent", params)
+      // 子组件传来的函数名  例如:{ function: "mapLoad" } getLnglat
+      console.log("callbackComponent", params.data)
       if (params.function) {
         // 给this上加一个函数
         this[params.function](params.data)
@@ -187,22 +187,12 @@ export default {
       // 等待子组件加载地图完成之后再调用deatil方法
       this.getDetaile()
     },
-    // 确定按钮的回调
-    // onSubmit(formName) {
-    //   this.$refs[formName].validate(valid => {
-    //     if (valid) {
-    //       this.id ? this.editParking() : this.addParking()
-    //     } else {
-    //       console.log("error submit!!")
-    //       return false
-    //     }
-    //   })
-    // },
     // 新增停车场API
     addParking() {
       this.button_loading = true
-      ParkingAdd(this.form)
+      ParkingAdd(this.form_data)
         .then(response => {
+          console.log("addParking", response)
           this.$message({
             type: "primary",
             message: response.message
@@ -217,8 +207,8 @@ export default {
     // 修改停车场
     editParking() {
       let requestData = JSON.parse(JSON.stringify(this.form_data))
-      this.button_loading = true
       requestData.id = this.id
+      this.button_loading = true
       ParkingEdit(requestData)
         .then(res => {
           this.$message({
@@ -252,6 +242,7 @@ export default {
         }
         // 设置覆物
         const splitLnglat = data.lnglat.split(",")
+        // console.log("1123123", splitLnglat)
         const lnglat = {
           lng: splitLnglat[0],
           lat: splitLnglat[1]
@@ -271,7 +262,8 @@ export default {
     },
     // 获取经纬度
     getLnglat(data) {
-      this.form.lnglat = data.lnglat.value
+      console.log("getLnglat", data.lnglat.value)
+      this.form_data.lnglat = data.lnglat.value
     }
   },
   beforeMount() {

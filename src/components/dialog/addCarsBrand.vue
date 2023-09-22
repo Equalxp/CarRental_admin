@@ -107,11 +107,13 @@ export default {
       if (this.logo.length != 0) {
         return false
       }
-      // 没有数据时
+      // 单独请求logo图片
       BrandLogo().then(response => {
         const data = response.data
+        console.log("BrandLogo", data)
         if (data) {
           this.logo = data
+          this.logo[0].img = "https://c-ssl.duitang.com/uploads/blog/201506/18/20150618142354_AVLNm.jpeg"
         }
       })
     },
@@ -133,6 +135,7 @@ export default {
       this.form_data = this.data
       this.logo_current = this.data.imgUrl
       this.form_data.imgUrl = this.data.imgUrl
+      // console.log("urlurlurlurlurl", this.data.imgUrl)
     },
     // 提交
     submit() {
@@ -141,14 +144,14 @@ export default {
     },
     // 添加
     add() {
-      this.form.imgUrl = this.logo_current
+      this.form_data.imgUrl = this.logo_current
       BrandAdd(this.form_data).then(response => {
         // console.log("BrandAdd", response)
         this.$message({
           type: "success",
           message: response.message
         })
-        this.close();
+        this.close()
         this.$emit("callbackComponent", {
           function: "search"
         })
@@ -162,12 +165,12 @@ export default {
       // requestData.id = this.id
       // 发请求
       BrandEdit(requestData).then(res => {
-        console.log("BrandEdit", res)
+        // console.log("BrandEdit", res)
         this.$message({
           type: "success",
-          message: response.message
+          message: res.message
         })
-        this.close();
+        this.close()
         this.$emit("callbackComponent", {
           function: "search"
         })
@@ -176,17 +179,17 @@ export default {
     },
     // 重置表单
     reset(formName) {
-      for(let key in this.form_data) {
-        this.form_data[key] = "";
+      for (let key in this.form_data) {
+        this.form_data[key] = ""
       }
       // 清除选中的LOGO
       this.logo_current = ""
     },
     // 反向修改
     close() {
-      this.reset("form");
+      this.reset("form")
       // 关闭窗口
-      this.dialogVisible = false;
+      this.dialogVisible = false
       this.$emit("update:flagVisible", false)
     }
   },

@@ -38,22 +38,7 @@
         </div>
       </template>
       <template v-slot:carsAttr>
-        <el-button type="primary" @click="addCarsAttr">添加汽车属性</el-button>
-        <div class="cars-attr-list" v-for="(item, index) in cars_attr" :key="item.key">
-          <el-row :gutter="10">
-            <el-col :span="2">
-              <!-- 双向绑定 属性的 key和value -->
-              <el-input v-model="item.attr_key"></el-input>
-            </el-col>
-            <el-col :span="3">
-              <el-input v-model="item.attr_value"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <!-- index可以用于表示当前删除的那个 -->
-              <el-button @click="delCarsAttr(index)">删除</el-button>
-            </el-col>
-          </el-row>
-        </div>
+        <CarsAttr :countKm.sync="form_data.countKm" :oil="form_data.oil" :initValue="form_data.carsAttr" ref="carsAttr" :value.sync="form_data.carsAttr" />
       </template>
     </VueForm>
   </div>
@@ -61,13 +46,15 @@
 <script>
 // 组件
 import VueForm from "@c/form"
+import CarsAttr from "./components/carsAttr.vue"
 // API
 import { CarsAdd, CarsDetailed, CarsEdit } from "../../api/car"
 import { GetCarsBrand, GetParking } from "@/api/common"
 export default {
-  name: "ParkingAdd",
+  name: "CarsAdd",
   components: {
-    VueForm
+    VueForm,
+    CarsAttr
   },
   data() {
     return {
@@ -142,6 +129,13 @@ export default {
           required: true
         },
         {
+          type: "Upload",
+          label: "缩略图",
+          placeholder: "请上传图片",
+          prop: "carsImg",
+          required: true
+        },
+        {
           type: "Input",
           label: "发动机号",
           placeholder: "请输入发动机号",
@@ -175,10 +169,9 @@ export default {
           label: "能源类型"
         },
         {
-          type: "Disabled",
-          label: "禁启用",
-          placeholder: "请选择禁启用",
-          prop: "status"
+          type: "Input",
+          label: "可行驶公里",
+          prop: "countKm"
         },
         {
           type: "Slot",
@@ -191,6 +184,12 @@ export default {
           type: "Wangeditor",
           prop: "content",
           label: "车辆描述"
+        },
+        {
+          type: "Disabled",
+          label: "禁启用",
+          placeholder: "请选择禁启用",
+          prop: "status"
         }
       ],
       // 按钮&事件
@@ -199,7 +198,11 @@ export default {
         { label: "重置", key: "reset" }
       ],
       // 车辆品牌列表
-      carsBrandList: []
+      carsBrandList: [],
+      // 上传文件配置
+      uploadData: {
+        token: ""
+      }
     }
   },
   mounted() {},
@@ -268,18 +271,7 @@ export default {
             this.form_data[key] = data[key]
           }
         }
-        const carsAttr = JSON.parse(data.carsAttr)
-        const arr = []
-        // 自定义添加的attr 请求下来是json
-        // console.log("CarsDetailed", response.data.carsAttr)
-        for (let key in carsAttr) {
-          const json = {}
-          json.attr_key = key
-          json.attr_value = carsAttr[key]
-          // { attr_key: "", attr_value: "" }
-          arr.push(json)
-        }
-        this.cars_attr = arr
+        // console.log("CarsDetailed", this.form_data)
       })
     },
     // 获取车辆品牌
@@ -310,7 +302,6 @@ export default {
         }
       }
     },
-
     // 添加车辆属性
     addCarsAttr() {
       this.cars_attr.push({ attr_key: "", attr_value: "" })
@@ -322,24 +313,7 @@ export default {
     },
     // 单独处理添加的汽车属性
     formatCarsAttr() {
-      const data = this.cars_attr
-      // 不存在
-      if (data && data.length == 0) {
-        return false
-      }
-      const carsAttr = {}
-      // forin
-      data.forEach(item => {
-        // key存在才添加 // 重复属性需要优化给出交互提示
-        if (item.attr_key) {
-          // key/value
-          carsAttr[item.attr_key] = item.attr_value
-        }
-      })
-      // 自定义新增的属性和属性值
-      // console.log('formatCarsAttr',carsAttr)
-      // 添加到form_data上
-      this.form_data.carsAttr = JSON.stringify(carsAttr)
+      this.$refs.carsAttr.callbackValue()
     },
     changeEnergyType(value) {
       this.form_data.oil = 0

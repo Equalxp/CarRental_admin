@@ -3,7 +3,7 @@ export function addressSetMapCenter(address, map) {
   const geocoder = new AMap.Geocoder()
   console.log('address.address', address.address);
   geocoder.getLocation(address.address, function (status, result) {
-    console.log(status,result);
+    // console.log(status,result);
     if (status === 'complete' && result.info === 'OK') {
       let lat = result.geocodes[0].location.lat;
       let lng = result.geocodes[0].location.lng;
