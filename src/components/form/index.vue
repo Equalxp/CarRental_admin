@@ -3,6 +3,9 @@
     <el-form-item v-for="item in formItem" :key="item.prop" :label="item.label" :prop="item.prop" :rules="item.rules">
       <!-- Input-->
       <el-input v-if="item.type === 'Input'" v-model.trim="formData[item.prop]" :placeholder="item.placeholder" :style="{ width: item.width }" :disabled="item.disabled"></el-input>
+      <!-- 文本-->
+      <!-- Input-->
+      <el-input type="textarea" :rows="item.rows || 5" v-if="item.type === 'Textarea'" v-model.trim="formData[item.prop]" :placeholder="item.placeholder" :style="{ width: item.width }" :disabled="item.disabled"></el-input>
       <!-- Select -->
       <el-select filterable v-if="item.type === 'Select'" :aaaa="item.options" v-model.trim="formData[item.prop]" :placeholder="item.placeholder" :style="{ width: item.width }" :disabled="item.disabled">
         <el-option v-for="selectItem in item.options" :key="selectItem.value || selectItem[item.select_vlaue]" :value="selectItem.value || selectItem[item.select_vlaue]" :label="selectItem.label || selectItem[item.select_label]"> </el-option>
@@ -25,7 +28,7 @@
       <!-- Upload组件 -->
       <template v-if="item.type === 'Upload'">
         <!--  -->
-        <Upload :imgUrl="formData[item.prop]"  :value.sync="formData[item.prop]" ></Upload>
+        <Upload :imgUrl="formData[item.prop]" :value.sync="formData[item.prop]"></Upload>
       </template>
     </el-form-item>
     <!-- 按钮 -->
@@ -71,9 +74,10 @@ export default {
       // 禁启用数据
       radio_disabled: this.$store.state.config.radio_disabled,
       type_msg: {
-        Input: "请输入",
-        Radio: "请选择",
-        Select: "请选择"
+        "Input": "请输入",
+        "Radio": "请选择",
+        "Select": "请选择",
+        "Disabled": "请选择"
       },
       // 清除富文本 true/false
       wangeditorClear: false
@@ -101,6 +105,7 @@ export default {
         }
       })
     },
+    // 外面调用this.$refs.vueForm.$refs.form然后再调用rules 验证方法
     rules(item) {
       // 是否是必填项
       const requiredRules = [{ required: true, message: item.required_msg || `${this.type_msg[item.type]}${item.label}`, trigger: "change" }]

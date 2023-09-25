@@ -5,6 +5,7 @@ const requestUrl = {
   brandListDelete: "/brand/delete/",
   carsList: "/cars/list/",
   carsListDelete: "/cars/delete/",
-  carsAttrList: "/carsAttr/list/"
+  carsAttrList: "/carsAttr/list/",
+  leaseList: "/lease/list/"
 }
 export default requestUrl;

@@ -44,3 +44,31 @@ export function CarsEdit(data = {}) {
     data
   })
 }
+
+// 获取详情（包含租赁类型） 
+export function CarsInfoDetailed(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/cars/carsDetailed/",
+    data
+  })
+}
+
+// 添加（包含租赁类型） 
+export function CarsInfoAdd(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/cars/carsInfoAdd/",
+    data
+  })
+}
+
+
+// 编辑（包含租赁类型） 
+export function CarsInfoEdit(data = {}) {
+  return service.request({
+    method: "post",
+    url: "/cars/carsInfoEdit/",
+    data
+  })
+}

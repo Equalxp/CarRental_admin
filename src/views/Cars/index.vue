@@ -78,7 +78,17 @@ export default {
               editButton: true,
               // 路由跳转到哪
               editButtonLink: "CarsAdd"
-            }
+            },
+            buttonGroup: [
+              {
+                label: "编辑",
+                type: "danger",
+                event: "link",
+                name: "CarsAdd",
+                key: "id",
+                value: "id"
+              }
+            ]
           }
         ],
         // url列表文件

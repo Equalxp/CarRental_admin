@@ -24,11 +24,13 @@
       <el-button type="danger" @click="reset" v-if="formConfig.resetButton">重置</el-button>
       <!-- 其他按钮 -->
       <template v-for="item in formHandler">
+        <!-- link -->
         <el-button v-if="item.element === 'link'" :key="item.key" :type="item.type">
           <router-link :to="item.router" style="color: #fff">
             {{ item.label }}
           </router-link>
         </el-button>
+        <!-- button -->
         <el-button v-if="item.element === 'button'" :key="item.key" :type="item.type" @click="item.handler && item.handler()">
           {{ item.label }}
         </el-button>
