@@ -45,6 +45,10 @@ export function CarsEdit(data = {}) {
   })
 }
 
+/**
+ * 新 包含租赁数据
+ */
+
 // 获取详情（包含租赁类型） 
 export function CarsInfoDetailed(data = {}) {
   return service.request({
@@ -62,7 +66,6 @@ export function CarsInfoAdd(data = {}) {
     data
   })
 }
-
 
 // 编辑（包含租赁类型） 
 export function CarsInfoEdit(data = {}) {

@@ -142,7 +142,8 @@ export default {
           label: "缩略图",
           placeholder: "请上传图片",
           prop: "carsImg",
-          required: true
+          required: true,
+          requestFlag: true
         },
         {
           type: "Input",
@@ -246,11 +247,8 @@ export default {
     },
     // 编辑车辆
     edit() {
-      const requestData = JSON.parse(JSON.stringify(this.form_data))
-      requestData.id = this.id
       // 解构 / JSON
-      // CarsEdit({ ...this.form_data, id: this.id }).then(response => {
-      CarsInfoEdit({ requestData, id: this.id, leasePrice: this.leaseListData }).then(response => {
+      CarsInfoEdit({ ...this.form_data, id: this.id, leasePrice: this.leaseListData }).then(response => {
         this.$message({
           message: response.message,
           type: "success"
@@ -259,6 +257,8 @@ export default {
     },
     // 新增车辆
     add() {
+      // console.log(this.form_data)
+      // return false
       CarsInfoAdd({ ...this.form_data, leasePrice: this.leaseListData }).then(response => {
         this.$message({
           message: response.message,
@@ -278,7 +278,7 @@ export default {
         return false
       }
       CarsInfoDetailed({ id: this.id }).then(response => {
-        // console.log("CarsInfoDetailed", response.data)
+        console.log("CarsInfoDetailed", response.data)
         const data = response.data
         if (!data) {
           return false
@@ -291,7 +291,6 @@ export default {
         }
         // 更新租赁类型数据
         this.leaseListData = data.leasePrice
-        // console.log("CarsInfoDetailed", this.form_data)
       })
     },
     // 获取车辆品牌

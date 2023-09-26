@@ -14,9 +14,7 @@ export default {
   data() {
     return {
       imageUrl: "",
-      uploadData: {
-        token: ""
-      }
+      uploadData: {}
     }
   },
   beforeMount() {
@@ -32,6 +30,7 @@ export default {
       }
       GetQiniuToken(requestData).then(res => {
         const data = res.data
+        // console.log("111111111111", data)
         if (data.token) {
           this.$store.commit("common/SET_UPLOAD_TOKEN", data.token)
         }
@@ -59,7 +58,6 @@ export default {
       let key = encodeURI(fileName)
       this.uploadData.key = key
       this.uploadData.token = this.$store.state.common.upload_token
-      // console.log(file);
       return isJPG && isLt2M
     }
   },
