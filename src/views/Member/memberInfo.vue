@@ -72,7 +72,8 @@ export default {
           type: "Upload",
           label: "身份证（正面）",
           prop: "cardPhotoFace",
-          required: true
+          required: true,
+          requestFlag: true
         },
         {
           type: "Upload",
@@ -162,6 +163,7 @@ export default {
           this.$router.push({
             name: "MemberList"
           })
+          // this.$router.go(-1);
         })
         .catch(error => {
           this.$message({

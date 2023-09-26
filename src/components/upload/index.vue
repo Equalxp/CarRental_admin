@@ -20,7 +20,7 @@ export default {
     }
   },
   beforeMount() {
-    this.getQiniuToken()
+    this.requestFlag && this.getQiniuToken()
   },
   methods: {
     // 获取qiniu token
@@ -33,7 +33,7 @@ export default {
       GetQiniuToken(requestData).then(res => {
         const data = res.data
         if (data.token) {
-          this.uploadData.token = data.token
+          this.$store.commit("common/SET_UPLOAD_TOKEN", data.token)
         }
         // console.log("GetQiniuToken", this.uploadData.token)
       })
@@ -58,6 +58,7 @@ export default {
       // 转码
       let key = encodeURI(fileName)
       this.uploadData.key = key
+      this.uploadData.token = this.$store.state.common.upload_token
       // console.log(file);
       return isJPG && isLt2M
     }
@@ -67,6 +68,10 @@ export default {
     imgUrl: {
       type: String,
       default: ""
+    },
+    requestFlag: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
