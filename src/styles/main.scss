@@ -4,7 +4,9 @@
 @import "./svgicon.scss";
 
 // color
-.color-white { color: #fff; }
+.color-white {
+  color: #fff;
+}
 
 // float
 .pull-right {
@@ -37,4 +39,9 @@
 
 .width-120 {
   width: 120px;
+}
+
+// heigt
+.min-height-1 {
+  min-height: 1px;
 }

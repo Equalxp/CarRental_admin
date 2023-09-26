@@ -82,7 +82,7 @@ export default {
             buttonGroup: [
               {
                 label: "编辑",
-                type: "danger",
+                type: "primary",
                 event: "link",
                 name: "CarsAdd",
                 key: "id",
