@@ -148,6 +148,7 @@ export default {
         url: this.table_config.url,
         data: this.table_config.data
       }
+      // console.log("loadData", requestData)
       // 请求之前跑
       this.loading_table = true
       // 去发请求 封装好的

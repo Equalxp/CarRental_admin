@@ -46,26 +46,28 @@ export default {
           {
             label: "真实姓名",
             prop: "truename",
-            width: 150
+            width: 100
           },
           {
             label: "租车订单",
             prop: "order",
-            width: 150
+            width: 100
           },
           {
             label: "违章预存金",
             prop: "illegalAmount",
-            width: 200
+            width: 100
           },
-          // {
-          //   label: "押金",
-          //   prop: "gilding"
-          // },
-          // {
-          //   label: "余额",
-          //   prop: "amount"
-          // },
+          {
+            label: "押金",
+            prop: "gilding",
+            width: 100
+          },
+          {
+            label: "余额",
+            prop: "amount",
+            width: 100
+          },
           {
             label: "实名认证",
             prop: "check_real_name",
@@ -73,7 +75,8 @@ export default {
             slotName: "realPhoto",
             handler: (status, data, type) => {
               this.updateReal(status, data, "identity")
-            }
+            },
+            width: 150
           },
           {
             label: "驾驶证",
@@ -83,7 +86,8 @@ export default {
             slotName: "realPhoto",
             handler: (status, data) => {
               this.updateReal(status, data, "drive")
-            }
+            },
+            width: 150
           },
           {
             label: "黑名单",
@@ -91,7 +95,8 @@ export default {
             type: "switch",
             handler: (status, data) => {
               this.updateBlacklist(status, data)
-            }
+            },
+            width: 150
           },
           {
             label: "操作",
@@ -99,7 +104,8 @@ export default {
             width: 300,
             buttonGroup: [
               { event: "link", label: "详情", type: "primary", name: "MemberDetailed", key: "id", value: "memberId" },
-              { event: "link", label: "编辑", type: "primary", name: "MemberInfo", key: "id", value: "memberId" }
+              { event: "link", label: "编辑", type: "primary", name: "MemberInfo", key: "id", value: "memberId" },
+              { event: "button", label: "金额清空", type: "", handler: data => this.amountClear(data) }
             ],
             default: {
               deleteButton: true,
@@ -212,6 +218,23 @@ export default {
           this.dialog_show = true
         }
       })
+    },
+    // 清空金额
+    amountClear(data) {
+      AmountClear({ member_id: data.memberId })
+        .then(res => {
+          // console.log("amountClear", res)
+          this.$message({
+            message: res.message,
+            type: "success"
+          })
+        })
+        .catch(error => {
+          this.$message({
+            message: res.message,
+            type: "error"
+          })
+        })
     }
   }
 }

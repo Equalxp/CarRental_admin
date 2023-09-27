@@ -17,7 +17,7 @@ import CityArea from "@c/common/cityArea"
 import MapLocation from "../../components/dialog/showMapLocation"
 import TableData from "../../components/tableData/index"
 // API
-import { CarsStatus, CarsDelete } from "../../api/car"
+import { CarsStatus, CarsLock } from "../../api/car"
 // common
 import { address, yearCheckType, energyType } from "@/utils/common"
 export default {
@@ -62,7 +62,20 @@ export default {
             slotName: "status",
             width: "100px"
           },
-          { label: "停车场", prop: "parkingName" },
+          {
+            label: "停车场",
+            prop: "parkingName"
+          },
+          {
+            label: "车辆状态",
+            prop: "cars_status",
+            type: "function",
+            callback: row => {
+              const carsStatus = this.$store.state.config.cars_status
+              const status = carsStatus[row.carsStatus]
+              return status ? status.zh : ""
+            }
+          },
           {
             label: "区域",
             prop: "address",
@@ -73,6 +86,7 @@ export default {
           {
             label: "操作",
             type: "operation",
+            width: 300,
             default: {
               deleteButton: true,
               editButton: true,
@@ -87,6 +101,12 @@ export default {
                 name: "CarsAdd",
                 key: "id",
                 value: "id"
+              },
+              {
+                label: "车辆释放",
+                type: "",
+                event: "button",
+                handler: data => this.lock(data)
               }
             ]
           }
@@ -163,6 +183,16 @@ export default {
           this.switch_disabled = ""
           // this.switch_flag = false;
         })
+    },
+    // 车辆释放
+    async lock(data) {
+      const res = await CarsLock({ id: data.id })
+      if (res.message == "修改成功！！") {
+        this.$message({
+          type: "success",
+          message: "释放成功"
+        })
+      }
     }
   },
   // DOM元素渲染之前（生命周期）
